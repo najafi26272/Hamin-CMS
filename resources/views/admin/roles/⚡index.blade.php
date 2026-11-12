@@ -45,14 +45,30 @@ new #[Layout('layouts::admin'), Title('لیست نقش‌ها')] class extends C
             ->orderBy('id')
             ->paginate(10);
     }
+
+    public function deleteRole(int $id): void
+    {
+        $role = Role::find($id);
+
+        if (! $role) {
+            $this->dispatch('notify', type: 'error', message: 'نقش مورد نظر پیدا نشد.');
+            return;
+        }
+
+        // نقش‌های سیستمی (مدیر اصلی و هنرمند) نباید حذف شوند
+        if (in_array($role->name, ['admin', 'artist'])) {
+            $this->dispatch('notify', type: 'error', message: 'نقش «'.($role->label ?? $role->name).'» نقش سیستمی است و قابل حذف نیست.');
+            return;
+        }
+
+        $role->delete(); // ارتباط با کاربران و مجوزها با cascade حذف می‌شود
+
+        $this->dispatch('notify', type: 'success', message: 'نقش با موفقیت حذف شد.');
+    }
 };
 ?>
 
 <div>
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">لیست نقش‌ها</h5>
         <a href="{{route('roles.create')}}" class="btn btn-primary">ثبت نقش جدید</a>
@@ -112,11 +128,12 @@ new #[Layout('layouts::admin'), Title('لیست نقش‌ها')] class extends C
                             </td>
                             <td>{{ $role->users_count }}</td>
                             <td>
-                                <a href="{{route("roles.edit" , ['role'=>$role])}}">
+                                <a href="{{route("roles.edit" , ['role'=>$role])}}" title="ویرایش">
                                     <i class="list-icon" data-feather="edit"></i>
                                 </a>
 
-                                <a href="#">
+                                <a href="#" title="حذف"
+                                   x-on:click.prevent="confirmDelete(() => $wire.deleteRole({{ $role->id }}), @js('نقش «'.($role->label ?? $role->name).'» حذف و از '.$role->users_count.' کاربر گرفته خواهد شد.'))">
                                     <i class="text-danger list-icon" data-feather="trash"></i>
                                 </a>
                             </td>

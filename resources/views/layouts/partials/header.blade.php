@@ -22,16 +22,16 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    <img class="w-30px h-30px ms-1 rounded-circle" src="{{asset("assets/admin/images/faces/pro.png")}}" alt="profile">
-                   {{Auth::user()?->name  }}   {{Auth::user()?->family }}
+                    <img class="w-30px h-30px ms-1 rounded-circle" src="{{ Auth::user()?->avatar_url }}" alt="profile">
+                   {{ Auth::user()?->first_name }} {{ Auth::user()?->last_name }}
                 </a>
                 <div class="dropdown-menu p-0" aria-labelledby="profileDropdown">
                     <div class="d-flex flex-column align-items-center border-bottom px-5 py-3">
                         <div class="mb-3">
-                            <img width="50" class="wd-40 ht-40 rounded-circle" src="{{asset("assets/admin/images/faces/pro.png")}}" alt="">
+                            <img width="50" class="wd-40 ht-40 rounded-circle" src="{{ Auth::user()?->avatar_url }}" alt="">
                         </div>
                         <div class="text-center">
-                            <p class="tx-16 fw-bolder">{{Auth::user()?->name}} {{Auth::user()?->family}}</p>
+                            <p class="tx-16 fw-bolder">{{ Auth::user()?->first_name }} {{ Auth::user()?->last_name }}</p>
                             <p class="tx-12 text-muted">{{Auth::user()?->username}}</p>
                         </div>
                     </div>

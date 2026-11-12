@@ -18,6 +18,8 @@
     <!-- endinject -->
 
     <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="{{asset("assets/admin/vendors/persian-datepicker/persian-datepicker.min.css")}}">
+    <link rel="stylesheet" href="{{asset("assets/admin/vendors/select2/select2.min.css")}}">
     <!-- End plugin css for this page -->
 
     <!-- inject:css -->
@@ -36,9 +38,9 @@
 
     <link rel="shortcut icon" type="image/x-icon" href="{{asset("assets/site/images/setad-logo.png")}}">
 
+    {{-- Alpine همراه لایو وایر لود می‌شود و نباید جداگانه اضافه شود --}}
     @livewireStyles
     @livewireScripts
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 
 </head>
@@ -52,18 +54,20 @@
             <div class="row w-100 mx-0 auth-page">
 
 
-                <div class="col-md-8 col-xl-6 mx-auto">
+                {{-- صفحه‌ها می‌توانند عنوان ($heading) و کارت عریض ($wide) را از طریق Layout تعیین کنند --}}
+                <div @class(['mx-auto', 'col-md-8 col-xl-6' => ! ($wide ?? false), 'col-lg-11 col-xl-9 my-4' => $wide ?? false])>
                     <div class="card">
                         <div class="row">
-                            <div class="col-md-4 pe-md-0">
-                                <div class="auth-side-wrapper">
+                            @unless ($wide ?? false)
+                                <div class="col-md-4 pe-md-0">
+                                    <div class="auth-side-wrapper">
 
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-8 ps-md-0">
+                            @endunless
+                            <div @class(['ps-md-0' => ! ($wide ?? false), 'col-md-8' => ! ($wide ?? false), 'col-12' => $wide ?? false])>
                                 <div class="auth-form-wrapper px-4 py-5">
-                                    <h5 class="text-muted fw-normal mb-4">خوش آمدید! به حساب کاربری خود وارد شوید
-                                    </h5>
+                                    <h5 class="text-muted fw-normal mb-4">{{ $heading ?? 'خوش آمدید! به حساب کاربری خود وارد شوید' }}</h5>
                                     {{ $slot }}
                                 </div>
                             </div>
@@ -88,7 +92,14 @@
 
 <!-- inject:js -->
 <script src="{{asset("assets/admin/vendors/feather-icons/feather.min.js")}}"></script>
+<script src="{{asset("assets/admin/vendors/persian-datepicker/persian-date.min.js")}}"></script>
+<script src="{{asset("assets/admin/vendors/persian-datepicker/persian-datepicker.min.js")}}"></script>
+<script src="{{asset("assets/admin/vendors/select2/select2.min.js")}}"></script>
 <script src="{{asset("assets/admin/js/app.js")}}"></script>
+<script>
+    // آیکن‌های feather بعد از هر بروزرسانی لایو وایر دوباره ساخته شوند
+    document.addEventListener('livewire:init', () => Livewire.hook('morphed', () => feather.replace()));
+</script>
 <!-- endinject -->
 
 <!-- Custom js for this page -->

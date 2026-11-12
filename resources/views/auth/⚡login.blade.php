@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-new #[Layout('layouts::login')] class extends Component
+new #[Layout('layouts::site', ['title' => 'ورود'])] class extends Component
 {
     public string $username = '';
     public string $password = '';
@@ -49,6 +49,7 @@ new #[Layout('layouts::login')] class extends Component
         }
 
         RateLimiter::clear($this->throttleKey());
+
         session()->regenerate();
 
         return $this->redirectIntended(route('dashboard'));
@@ -76,55 +77,47 @@ new #[Layout('layouts::login')] class extends Component
 };
 ?>
 
-<form wire:submit="login" class="forms-sample" novalidate>
-    <div class="mb-3">
-        <label for="username" class="form-label">نام کاربری</label>
-        <input type="text"
-               wire:model="username"
-               class="form-control @error('username') is-invalid @enderror"
-               id="username"
-               autocomplete="username"
-               placeholder="نام کاربری"
-               autofocus>
-        @error('username')
-        <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
+<div class="container auth-wrap">
+    <div class="auth-card">
+        <div class="auth-form">
+            <h1>ورود به حساب</h1>
+            <p class="lead">خوش آمدید! نام کاربری و رمز عبور خود را وارد کنید.</p>
 
-    <div class="mb-3">
-        <label for="password" class="form-label">رمز عبور</label>
-        <input type="password"
-               wire:model="password"
-               class="form-control @error('password') is-invalid @enderror"
-               id="password"
-               autocomplete="current-password"
-               placeholder="رمز عبور">
-        @error('password')
-        <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
+            <form wire:submit="login" novalidate>
+                @if (session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
 
-    <div class="form-check mb-3">
-        <input type="checkbox"
-               wire:model="remember"
-               class="form-check-input"
-               id="remember">
-        <label class="form-check-label" for="remember">
-            مرا به خاطر بسپار
-        </label>
-    </div>
+                <div class="field">
+                    <label for="username">نام کاربری</label>
+                    <input type="text" id="username" wire:model="username" dir="ltr" autocomplete="username" autofocus
+                           class="input input-ltr @error('username') is-invalid @enderror" placeholder="username">
+                    @error('username') <div class="error">{{ $message }}</div> @enderror
+                </div>
 
-    <div>
-        <button type="submit"
-                wire:loading.attr="disabled"
-                class="btn btn-outline-primary btn-icon-text mb-2 mb-md-0">
-            <span wire:ignore>
-                <i class="btn-icon-prepend" data-feather="log-in"></i>
-            </span>
-            <span wire:loading.remove wire:target="login">ورود</span>
-            <span wire:loading wire:target="login">در حال ورود...</span>
-        </button>
-    </div>
+                <div class="field">
+                    <label for="password">رمز عبور</label>
+                    <input type="password" id="password" wire:model="password" dir="ltr" autocomplete="current-password"
+                           class="input input-ltr @error('password') is-invalid @enderror" placeholder="••••••••">
+                    @error('password') <div class="error">{{ $message }}</div> @enderror
+                </div>
 
-    <a href="#" class="d-block mt-3 text-muted">حساب کاربری ندارید؟ ثبت نام کنید</a>
-</form>
+                <div class="field">
+                    <label class="check"><input type="checkbox" wire:model="remember"> مرا به خاطر بسپار</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" wire:loading.attr="disabled" wire:target="login">
+                    <span wire:loading.remove wire:target="login">ورود</span>
+                    <span wire:loading wire:target="login">در حال ورود...</span>
+                </button>
+            </form>
+
+            <p class="auth-switch">حساب کاربری ندارید؟ <a href="{{ route('register') }}">عضو شوید</a></p>
+        </div>
+
+        <div class="auth-side">
+            <h2>مجمع هنری هامین</h2>
+            <p>آثار خود را در لوح، شنیداری، تماشایی و شعر با دیگران به اشتراک بگذارید.</p>
+        </div>
+    </div>
+</div>

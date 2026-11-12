@@ -10,28 +10,43 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // مجوزها
-        $users = Permission::updateOrCreate(
-            ['name' => 'manage-users'],
-            ['label' => 'دسترسی به کاربران']
-        );
-        $content = Permission::updateOrCreate(
-            ['name' => 'manage-content'],
-            ['label' => 'دسترسی به محتوا']
-        );
+        // مجوزها از config/permissions.php خوانده می‌شوند
+        foreach (config('permissions') as $name => $permission) {
+            Permission::updateOrCreate(
+                ['name' => $name],
+                ['label' => $permission['label'], 'description' => $permission['description'] ?? null]
+            );
+        }
+
+        // مجوزهایی که دیگر در کد تعریف نشده‌اند حذف شوند
+        Permission::whereNotIn('name', array_keys(config('permissions')))->delete();
 
         // نقش‌ها
         $superAdmin = Role::updateOrCreate(
             ['name' => 'admin'],
             ['label' => 'ادمین اصلی']
         );
-        $author = Role::updateOrCreate(
+        $author = Role::firstOrCreate(
             ['name' => 'author'],
             ['label' => 'نویسنده']
         );
 
-        // مجوزهای هر نقش
-        $superAdmin->permissions()->sync([$users->id, $content->id]);
-        $author->permissions()->sync([$content->id]);
+        // هنرمندانی که از سایت ثبت‌نام می‌کنند (فقط ارسال مطلب در دسته‌بندی‌های مربوط به تخصص خود)
+        $artist = Role::firstOrCreate(
+            ['name' => 'artist'],
+            ['label' => 'هنرمند', 'description' => 'هنرمندان ثبت‌نام شده از سایت']
+        );
+
+        // مدیر اصلی همه مجوزها را دارد
+        $superAdmin->permissions()->sync(Permission::pluck('id'));
+
+        // نویسنده به صورت پیش‌فرض به محتوا دسترسی دارد (بقیه از پنل قابل تغییر است)
+        $author->permissions()->syncWithoutDetaching(
+            Permission::whereIn('name', ['manage-content', 'edit-content', 'publish-news'])->pluck('id')
+        );
+
+        $artist->permissions()->syncWithoutDetaching(
+            Permission::whereIn('name', ['submit-content'])->pluck('id')
+        );
     }
 }

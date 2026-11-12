@@ -19,7 +19,9 @@
 
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="{{asset("assets/admin/vendors/flatpickr/flatpickr.min.css")}}">
-    <link rel="stylesheet" href="{{asset("assets/admin/css/persian-datepicker-0.4.5.min.css")}}">
+    <link rel="stylesheet" href="{{asset("assets/admin/vendors/persian-datepicker/persian-datepicker.min.css")}}">
+    <link rel="stylesheet" href="{{asset("assets/admin/vendors/select2/select2.min.css")}}">
+    <link rel="stylesheet" href="{{asset("assets/admin/vendors/ckeditor5/ckeditor5.css")}}">
     <!-- End plugin css for this page -->
 
     <!-- inject:css -->
@@ -36,8 +38,8 @@
     @stack('css')
 
     @livewireStyles
+    {{-- Alpine همراه لایو وایر لود می‌شود و نباید جداگانه اضافه شود --}}
     @livewireScripts
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         .upload-btn {
             width: 130px;
@@ -56,6 +58,29 @@
             width: calc(100% - 130px);
 
 
+        }
+
+        /* ویرایشگر متن CKEditor: هماهنگ با تم روشن و تیره */
+        .ck.ck-editor {
+            --ck-color-base-background: var(--bs-body-bg);
+            --ck-color-base-border: var(--bs-border-color);
+            --ck-color-toolbar-background: var(--bs-tertiary-bg);
+            --ck-color-toolbar-border: var(--bs-border-color);
+            --ck-color-text: var(--bs-body-color);
+            --ck-color-button-default-hover-background: var(--bs-secondary-bg);
+            --ck-color-button-on-background: var(--bs-secondary-bg);
+            --ck-color-button-on-hover-background: var(--bs-secondary-bg);
+            --ck-color-dropdown-panel-background: var(--bs-body-bg);
+            --ck-color-panel-background: var(--bs-body-bg);
+            --ck-color-input-background: var(--bs-body-bg);
+            --ck-color-input-text: var(--bs-body-color);
+            --ck-color-list-background: var(--bs-body-bg);
+            --ck-color-list-button-hover-background: var(--bs-secondary-bg);
+            --ck-color-labeled-field-label-background: var(--bs-body-bg);
+        }
+
+        .ck-content {
+            color: var(--bs-body-color);
         }
     </style>
 
@@ -98,12 +123,93 @@
 
 <!-- inject:js -->
 <script src="{{asset("assets/admin/vendors/feather-icons/feather.min.js")}}"></script>
-<script src="{{asset("assets/admin/js/persian-date-0.1.8.min.js")}}"></script>
+<script src="{{asset("assets/admin/vendors/persian-datepicker/persian-date.min.js")}}"></script>
+<script src="{{asset("assets/admin/vendors/persian-datepicker/persian-datepicker.min.js")}}"></script>
+<script src="{{asset("assets/admin/vendors/select2/select2.min.js")}}"></script>
 <script src="{{asset("assets/admin/js/app.js")}}"></script>
+<script src="{{asset("assets/admin/js/editor.js")}}"></script>
 <!-- endinject -->
 
 
 <script src="{{asset("assets/admin/vendors/sweetalert2/sweetalert2.min.js")}}"></script>
+
+<script>
+    // نمایش پیغام کوتاه (موفق / خطا)
+    function notify(type, message) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: type,
+            title: message,
+            showConfirmButton: false,
+            timer: 3500,
+            timerProgressBar: true,
+            background: 'var(--bs-body-bg)',
+            color: 'var(--bs-body-color)',
+        });
+    }
+
+    // باکس تایید حذف
+    function confirmDelete(onConfirm, text = 'این عملیات قابل بازگشت نیست.') {
+        Swal.fire({
+            title: 'آیا از حذف مطمئن هستید؟',
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'بله، حذف شود',
+            cancelButtonText: 'انصراف',
+            confirmButtonColor: '#ff3366',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true,
+            background: 'var(--bs-body-bg)',
+            color: 'var(--bs-body-color)',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                onConfirm();
+            }
+        });
+    }
+
+    // کادر دریافت توضیحات (مثلا دلیل رد صلاحیت یا رد مطلب)
+    // required: اگر true باشد، بدون نوشتن دلیل ثبت نمی‌شود
+    function askReason(title, onSubmit, required = false, label = 'توضیحات (به کاربر هنگام ورود نمایش داده می‌شود)') {
+        Swal.fire({
+            title: title,
+            input: 'textarea',
+            inputLabel: label,
+            inputPlaceholder: 'دلیل را بنویسید...',
+            inputAttributes: {maxlength: 1000},
+            inputValidator: (value) => required && ! value.trim() ? 'لطفا دلیل را بنویسید.' : undefined,
+            showCancelButton: true,
+            confirmButtonText: 'ثبت',
+            cancelButtonText: 'انصراف',
+            confirmButtonColor: '#ff3366',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true,
+            background: 'var(--bs-body-bg)',
+            color: 'var(--bs-body-color)',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                onSubmit(result.value ?? '');
+            }
+        });
+    }
+
+    document.addEventListener('livewire:init', () => {
+        // پیغام‌هایی که از کامپوننت‌ها با dispatch('notify') ارسال می‌شوند
+        Livewire.on('notify', ({type, message}) => notify(type, message));
+
+        // آیکن‌های feather بعد از هر بروزرسانی لایو وایر دوباره ساخته شوند
+        Livewire.hook('morphed', () => feather.replace());
+    });
+
+    @if (session('success'))
+        document.addEventListener('DOMContentLoaded', () => notify('success', @js(session('success'))));
+    @endif
+    @if (session('error'))
+        document.addEventListener('DOMContentLoaded', () => notify('error', @js(session('error'))));
+    @endif
+</script>
 
 
 <!-- Custom js for this page -->

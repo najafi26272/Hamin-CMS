@@ -149,12 +149,13 @@
   // current url [Eg: dashboard.html]
   const current = location.pathname.split("/").slice(-1)[0].replace(/^\/|\/$/g, '');
 
-  if (sidebar) {
-    const sidebarNavLinks = document.querySelectorAll('.sidebar .nav li a');
-    sidebarNavLinks.forEach( navLink => {
-      addActiveClass(navLink);
-    });
-  }
+  // آیتم فعال سایدبار در سمت سرور (sidebar.blade.php) با نام روت مشخص می‌شود
+  // if (sidebar) {
+  //   const sidebarNavLinks = document.querySelectorAll('.sidebar .nav li a');
+  //   sidebarNavLinks.forEach( navLink => {
+  //     addActiveClass(navLink);
+  //   });
+  // }
 
   if (horizontalMenu) {
     const navbarNavLinks = document.querySelectorAll('.horizontal-menu .nav li a');
