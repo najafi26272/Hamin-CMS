@@ -35,6 +35,7 @@ Route::middleware('auth')->prefix('panel')->group(function () {
     include 'comments.php';
     include 'sliders.php';
     include 'events.php';
+    include 'social-links.php';
 
     Route::get('/logout', function () {
         Auth::logout();

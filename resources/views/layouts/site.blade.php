@@ -94,6 +94,9 @@
             <li><a href="{{ route('site.artists') }}">هنرمندان</a></li>
             <li><a href="{{ route('site.events') }}">رویدادها</a></li>
         </ul>
+        <div class="footer-social">
+            @include('site.partials.social-links')
+        </div>
     </div>
     <div class="footer-bottom">
         <div class="container">© {{ jdate()->format('Y') }} مجمع هنری هامین — همه حقوق محفوظ است.</div>

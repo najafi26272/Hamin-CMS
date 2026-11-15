@@ -5,15 +5,19 @@
 
 @push('head')
     <meta property="og:title" content="{{ $post->title }}">
-    <meta property="og:type" content="article">
-    @if ($post->image_url)
-        <meta property="og:image" content="{{ $post->image_url }}">
+    <meta property="og:type" content="{{ $post->type === 'video' ? 'video.other' : ($post->type === 'audio' ? 'music.song' : 'article') }}">
+    <meta property="og:url" content="{{ route('site.post', $post) }}">
+    @if ($cover)
+        <meta property="og:image" content="{{ $cover }}">
     @endif
 @endpush
 
 @php
     $cfg = $post->typeConfig();
     $isArtist = $post->user?->artist_status === 'approved';
+    $hasContent = trim(strip_tags((string) $post->content)) !== '';
+    $published = jdate($post->published_at->copy()->setTimezone('Asia/Tehran'));
+    $shareUrl = route('site.post', $post);
 @endphp
 
 @section('content')
@@ -26,72 +30,108 @@
 
     <div class="post-layout">
         <div>
-            <article class="post-article">
+            <article class="post-article post-{{ $post->type }}">
                 <header class="post-header">
                     <span class="post-type"><x-site.icon :name="$cfg['icon']" /> {{ $cfg['label'] }}</span>
                     <h1 class="post-title">{{ $post->title }}</h1>
                     <div class="post-meta">
                         @if ($post->creator_name)
-                            <span><x-site.icon name="user" /> {{ $cfg['creator'] ?? 'صاحب اثر' }}: {{ $post->creator_name }}</span>
+                            <span><x-site.icon name="user" /> {{ $cfg['creator'] ?? 'صاحب اثر' }}: <strong>{{ $post->creator_name }}</strong></span>
                         @endif
-                        <span><x-site.icon name="calendar" /> {{ jdate($post->published_at->copy()->setTimezone('Asia/Tehran'))->format('j F Y') }}</span>
+                        <span><x-site.icon name="calendar" /> {{ $published->format('j F Y') }}</span>
                         <span><x-site.icon name="eye" /> {{ number_format($post->views_count) }} بازدید</span>
                     </div>
                 </header>
 
-                {{-- محتوای اصلی بر اساس نوع --}}
+                {{-- ================= محتوای اصلی بر اساس نوع ================= --}}
                 @switch($post->type)
+
+                    {{-- لوح: تصویر اصلی اثر با امکان مشاهده در اندازه کامل --}}
                     @case('visual')
-                        @if ($post->media_url || $post->image_url)
-                            <div class="post-media is-image">
-                                <a href="{{ $post->media_url ?? $post->image_url }}" target="_blank" rel="noopener">
-                                    <img src="{{ $post->media_url ?? $post->image_url }}" alt="{{ $post->title }}">
+                        @php
+                            $artwork = $media ? $media['url'] : $post->image_url;
+                        @endphp
+                        @if ($artwork)
+                            <figure class="post-media is-image">
+                                <a href="{{ $artwork }}" target="_blank" rel="noopener" title="نمایش در اندازه اصلی">
+                                    <img src="{{ $artwork }}" alt="{{ $post->title }}{{ $post->creator_name ? ' — اثر '.$post->creator_name : '' }}">
                                 </a>
-                            </div>
+                                <figcaption>برای دیدن تصویر در اندازه اصلی روی آن کلیک کنید.</figcaption>
+                            </figure>
+                        @else
+                            @include('site.partials.media-missing', ['icon' => 'image', 'text' => 'تصویر این اثر هنوز بارگذاری نشده است.'])
                         @endif
                         @break
 
-                    @case('video')
-                        @if ($post->media_url)
-                            <div class="post-media">
-                                <video src="{{ $post->media_url }}" controls preload="metadata" playsinline @if ($post->image_url) poster="{{ $post->image_url }}" @endif></video>
-                            </div>
-                        @endif
-                        @break
-
+                    {{-- شنیداری: پخش‌کننده با کاور، موج صدا، زمان و کنترل صدا --}}
                     @case('audio')
-                        <div class="post-audio">
-                            <div class="cover">
-                                @if ($post->image_url)
-                                    <img src="{{ $post->image_url }}" alt="{{ $post->title }}">
+                        <div class="audio-player" data-audio-card>
+                            <div class="audio-player-cover">
+                                @if ($cover)
+                                    <img src="{{ $cover }}" alt="{{ $post->title }}">
                                 @else
                                     <span class="placeholder"><x-site.icon name="music" /></span>
                                 @endif
                             </div>
-                            <div>
-                                <strong>{{ $post->title }}</strong>
+                            <div class="audio-player-body">
+                                <div class="audio-player-title">{{ $post->title }}</div>
                                 @if ($post->creator_name)
-                                    <div class="audio-creator" style="margin-bottom: 10px">{{ $post->creator_name }}</div>
+                                    <div class="audio-creator">{{ $post->creator_name }}</div>
                                 @endif
-                                @if ($post->media_url)
-                                    <audio src="{{ $post->media_url }}" controls preload="metadata"></audio>
+
+                                @if ($media)
+                                    <div class="audio-player-controls">
+                                        <button type="button" class="audio-play" aria-label="پخش و توقف">
+                                            <x-site.icon name="play" class="icon i-play" />
+                                            <x-site.icon name="pause" class="icon i-pause" />
+                                        </button>
+                                        @include('site.partials.wave', ['seed' => $post->id, 'bars' => 80])
+                                    </div>
+                                    <div class="audio-player-time">
+                                        <span class="audio-current">0:00</span>
+                                        <span class="audio-time">0:00</span>
+                                    </div>
+                                    <audio src="{{ $media['url'] }}" preload="metadata"></audio>
+                                @else
+                                    <p class="media-missing-inline"><x-site.icon name="music" /> فایل صوتی این اثر هنوز بارگذاری نشده است.</p>
                                 @endif
                             </div>
                         </div>
                         @break
 
-                    @default
-                        @if ($post->image_url)
-                            <div class="post-media is-image">
-                                <img src="{{ $post->image_url }}" alt="{{ $post->title }}">
+                    {{-- تماشایی: پخش‌کننده ویدیو با پوستر --}}
+                    @case('video')
+                        @if ($media)
+                            <div class="post-media is-video">
+                                <video src="{{ $media['url'] }}" controls preload="metadata" playsinline controlslist="nodownload" @if ($cover) poster="{{ $cover }}" @endif>
+                                    مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+                                </video>
                             </div>
+                        @else
+                            @include('site.partials.media-missing', ['icon' => 'film', 'text' => 'فایل ویدیوی این اثر هنوز بارگذاری نشده است.', 'background' => $cover])
+                        @endif
+                        @break
+
+                    {{-- شعر و اخبار: تصویر شاخص (در شعر کوچک‌تر و کنار متن) --}}
+                    @default
+                        @if ($cover)
+                            <figure @class(['post-media is-image', 'is-poster' => $post->type === 'poem'])>
+                                <img src="{{ $cover }}" alt="{{ $post->title }}">
+                            </figure>
                         @endif
                 @endswitch
 
-                @if (trim(strip_tags((string) $post->content)) !== '')
-                    <div @class(['post-content', 'is-poem' => $post->type === 'poem'])>
+                {{-- ================= متن ================= --}}
+                @if ($hasContent)
+                    <section @class(['post-content', 'is-poem' => $post->type === 'poem' || ($post->type === 'audio' && $looksLikePoem)])>
+                        @if ($post->type !== 'news')
+                            <h2 class="content-label">{{ $post->type === 'audio' && $looksLikePoem ? 'متن شعر' : $cfg['content_label'] }}</h2>
+                        @endif
                         {!! \App\Support\HtmlSanitizer::clean($post->content) !!}
-                    </div>
+                        @if ($post->type === 'poem' && $post->creator_name)
+                            <p class="poem-signature">— {{ $post->creator_name }}</p>
+                        @endif
+                    </section>
                 @else
                     <div style="height: 26px"></div>
                 @endif
@@ -108,15 +148,15 @@
                 @endif
             </article>
 
-            {{-- دیدگاه‌ها --}}
+            {{-- ================= دیدگاه‌ها ================= --}}
             <section class="comments" id="comments">
-                <h2><x-site.icon name="message" /> دیدگاه‌ها <small style="color: var(--muted); font-weight: 400">({{ $comments->count() }})</small></h2>
+                <h2><x-site.icon name="message" /> دیدگاه‌ها <small style="color: var(--muted); font-weight: 400">({{ number_format($comments->count()) }})</small></h2>
 
                 @if (session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
 
-                @foreach ($comments as $comment)
+                @forelse ($comments as $comment)
                     <div class="comment">
                         <div class="comment-head">
                             <strong>{{ $comment->name }}</strong>
@@ -133,7 +173,9 @@
                             </div>
                         @endforeach
                     </div>
-                @endforeach
+                @empty
+                    <p style="color: var(--muted)">هنوز دیدگاهی ثبت نشده است. اولین نفر باشید!</p>
+                @endforelse
 
                 <form action="{{ route('site.comments.store', $post) }}" method="post" class="form-box" style="margin-top: 18px">
                     @csrf
@@ -165,7 +207,34 @@
             </section>
         </div>
 
+        {{-- ================= ستون کناری ================= --}}
         <aside>
+            {{-- مشخصات اثر --}}
+            <div class="sidebar-box">
+                <h3>مشخصات {{ $post->type === 'news' ? 'خبر' : 'اثر' }}</h3>
+                <dl class="facts">
+                    <div><dt>نوع</dt><dd>{{ $cfg['label'] }}</dd></div>
+                    @if ($post->creator_name)
+                        <div><dt>{{ $cfg['creator'] ?? 'صاحب اثر' }}</dt><dd>{{ $post->creator_name }}</dd></div>
+                    @endif
+                    @if ($media)
+                        @if (in_array($post->type, ['audio', 'video'], true))
+                            <div><dt>مدت</dt><dd data-media-duration>—</dd></div>
+                        @endif
+                        @if ($media['dimensions'])
+                            <div><dt>ابعاد</dt><dd>{{ $media['dimensions'] }}</dd></div>
+                        @endif
+                        <div><dt>قالب فایل</dt><dd>{{ $media['format'] }}</dd></div>
+                        @if ($media['size'])
+                            <div><dt>حجم</dt><dd>{{ $media['size'] }}</dd></div>
+                        @endif
+                    @endif
+                    <div><dt>تاریخ انتشار</dt><dd>{{ $published->format('j F Y') }}</dd></div>
+                    <div><dt>بازدید</dt><dd>{{ number_format($post->views_count) }}</dd></div>
+                    <div><dt>دیدگاه</dt><dd>{{ number_format($comments->count()) }}</dd></div>
+                </dl>
+            </div>
+
             @if ($post->user && $isArtist)
                 <div class="sidebar-box">
                     <h3>هنرمند</h3>
@@ -178,6 +247,16 @@
                     </a>
                 </div>
             @endif
+
+            {{-- اشتراک‌گذاری --}}
+            <div class="sidebar-box">
+                <h3>اشتراک‌گذاری</h3>
+                <div class="share">
+                    <a href="https://t.me/share/url?url={{ urlencode($shareUrl) }}&text={{ urlencode($post->title) }}" target="_blank" rel="noopener" title="تلگرام" style="--brand: #229ed9"><x-site.icon name="social-telegram" /></a>
+                    <a href="https://wa.me/?text={{ urlencode($post->title.' '.$shareUrl) }}" target="_blank" rel="noopener" title="واتساپ" style="--brand: #25d366"><x-site.icon name="social-whatsapp" /></a>
+                    <button type="button" data-copy="{{ $shareUrl }}" title="کپی لینک"><x-site.icon name="link" /> <span>کپی لینک</span></button>
+                </div>
+            </div>
 
             @if ($related->isNotEmpty())
                 <div class="sidebar-box">

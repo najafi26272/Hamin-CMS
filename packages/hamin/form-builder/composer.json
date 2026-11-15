@@ -1,0 +1,28 @@
+{
+    "name": "hamin/form-builder",
+    "description": "فرم‌ساز قابل حمل برای لاراول: فیلدهای خام و فیلدهای پروفایل کاربر، پنل Livewire و API JSON",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0|^13.0"
+    },
+    "suggest": {
+        "livewire/livewire": "برای پنل مدیریت و نمایش فرم آماده (^3.0|^4.0)",
+        "morilog/jalali": "برای نمایش تاریخ‌ها به شمسی"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hamin\\FormBuilder\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hamin\\FormBuilder\\FormBuilderServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -10,6 +10,23 @@
     font-display: swap;
 }
 
+/* اعداد فارسی: فقط کاراکترهای ۰ تا ۹ از نسخه «ارقام فارسی» وزیرمتن خوانده می‌شوند،
+   پس هر عدد لاتینی که در صفحه چاپ شود (تاریخ، تعداد، زمان پخش، صفحه‌بندی و ...) فارسی دیده می‌شود */
+@font-face {
+    font-family: "HaminDigits";
+    src: url("../fonts/Vazirmatn-FD-NL-Regular.woff2") format("woff2");
+    font-weight: 100 599;
+    font-display: swap;
+    unicode-range: U+0030-0039;
+}
+@font-face {
+    font-family: "HaminDigits";
+    src: url("../fonts/Vazirmatn-FD-NL-Bold.woff2") format("woff2");
+    font-weight: 600 900;
+    font-display: swap;
+    unicode-range: U+0030-0039;
+}
+
 :root {
     --orange: #ff6600;
     --orange-dark: #e05a00;
@@ -43,7 +60,7 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Vazirmatn", Tahoma, sans-serif;
+    font-family: "HaminDigits", "Vazirmatn", Tahoma, sans-serif;
     font-size: 15px;
     line-height: 1.85;
     direction: rtl;
@@ -328,14 +345,60 @@ p { margin: 0 0 1em; }
 .post-media img { width: 100%; max-height: 640px; object-fit: contain; background: var(--surface-2); }
 .post-media video { width: 100%; max-height: 640px; background: #000; }
 .post-media.is-image { background: var(--surface-2); }
+.post-media.is-video { background: #000; aspect-ratio: 16 / 9; }
+.post-media.is-video video { width: 100%; height: 100%; max-height: none; }
+figure.post-media { margin-block-end: 0; }
+.post-media figcaption { font-size: 12px; color: var(--muted); text-align: center; padding: 6px; background: var(--surface); }
+/* پوستر شعر: کوچک‌تر و وسط */
+.post-media.is-poster { margin-inline: max(30px, calc((100% - 420px) / 2)); }
+.post-media.is-poster img { aspect-ratio: 4 / 3; object-fit: cover; }
 
-.post-audio {
-    margin: 20px 30px 0; display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: center;
-    background: var(--surface-2); border-radius: var(--radius-sm); padding: 16px;
+/* جای خالی فایل اصلی */
+.media-missing {
+    margin: 20px 30px 0; border-radius: var(--radius-sm); aspect-ratio: 16 / 7; position: relative; overflow: hidden;
+    background: var(--surface-2) center / cover no-repeat; display: grid; place-items: center;
 }
-.post-audio .cover { aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; }
-.post-audio .cover img { width: 100%; height: 100%; object-fit: cover; }
-.post-audio audio { width: 100%; }
+.media-missing::before { content: ""; position: absolute; inset: 0; background: rgba(250, 248, 245, .82); backdrop-filter: blur(3px); }
+.media-missing-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; text-align: center; padding: 16px; }
+.media-missing-inner .icon { width: 40px; height: 40px; color: var(--orange); opacity: .7; }
+.media-missing-inline { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; margin: 14px 0 0; }
+
+/* پخش‌کننده صوت صفحه مطلب */
+.audio-player {
+    margin: 20px 30px 0; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 24px; align-items: center;
+    background: linear-gradient(135deg, var(--orange-soft), var(--teal-soft)); border-radius: var(--radius); padding: 20px;
+}
+.audio-player-cover { aspect-ratio: 1; border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow-hover); background: var(--surface); }
+.audio-player-cover img { width: 100%; height: 100%; object-fit: cover; }
+.audio-player-title { font-size: 19px; font-weight: 800; line-height: 1.6; }
+.audio-player-controls { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
+.audio-player-controls .audio-play { width: 64px; height: 64px; }
+.audio-player-controls .audio-play .icon { width: 26px; height: 26px; }
+.audio-player-controls .wave { flex: 1; height: 46px; }
+.audio-player-time { display: flex; justify-content: space-between; direction: ltr; font-size: 12.5px; color: var(--muted); margin-top: 4px; padding-left: 80px; }
+.audio-player-time .audio-time { min-width: 0; }
+
+.content-label { font-size: 15px !important; color: var(--teal); margin: 0 0 .6em !important; }
+.post-content.is-poem .content-label { text-align: right; }
+.poem-signature { color: var(--muted); font-size: 15px; margin-top: .5em; }
+
+/* مشخصات اثر */
+.facts { margin: 0; display: grid; gap: 0; }
+.facts > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; font-size: 13.5px; }
+.facts > div + div { border-top: 1px dashed var(--border); }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-weight: 600; text-align: left; }
+
+/* اشتراک‌گذاری */
+.share { display: flex; gap: 8px; flex-wrap: wrap; }
+.share a, .share button {
+    height: 40px; min-width: 40px; padding: 0 12px; border-radius: var(--pill); border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--teal); display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer; font-size: 13px; font-weight: 600; transition: .2s;
+}
+.share a { padding: 0; width: 40px; }
+.share a:hover { background: var(--brand); border-color: var(--brand); color: #fff; }
+.share button:hover, .share button.copied { background: var(--teal); border-color: var(--teal); color: #fff; }
 
 .post-content { padding: 22px 30px 30px; font-size: 16px; line-height: 2.1; }
 .post-content h2 { font-size: 21px; margin-top: 1.2em; }
@@ -410,7 +473,8 @@ p { margin: 0 0 1em; }
 }
 .input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-soft); }
 .input.is-invalid { border-color: #d64545; }
-.input-ltr { direction: ltr; text-align: left; }
+/* فیلدهای لاتین (نام کاربری، رمز، ایمیل، شماره) ارقام لاتین را همان‌طور که تایپ می‌شوند نشان می‌دهند */
+.input-ltr { direction: ltr; text-align: left; font-family: "Vazirmatn", Tahoma, sans-serif; }
 textarea.input { resize: vertical; min-height: 120px; line-height: 1.9; }
 .error { color: #d64545; font-size: 12.5px; margin-top: 4px; }
 .check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
@@ -515,6 +579,21 @@ textarea.input { resize: vertical; min-height: 120px; line-height: 1.9; }
 .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; padding-block: 30px; }
 .footer-inner img { height: 40px; width: auto; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 6px 20px; list-style: none; margin: 0; padding: 0; font-size: 14px; }
+/* شبکه‌های اجتماعی: دکمه‌های گرد که با hover رنگ برند همان شبکه را می‌گیرند */
+.social-links { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.social-links a {
+    width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--surface-2); color: var(--teal); border: 1px solid var(--border); transition: .2s;
+}
+.social-links a:hover, .social-links a:focus-visible {
+    background: var(--brand, var(--orange)); border-color: var(--brand, var(--orange)); color: #fff; transform: translateY(-2px);
+}
+.social-links .icon { width: 20px; height: 20px; }
+/* آیکن آپلودشده: رنگ خودش حفظ می‌شود و در hover فقط کادر رنگ برند می‌گیرد */
+.social-links img { width: 24px; height: 24px; object-fit: contain; }
+.social-links a:has(img) { background: var(--surface); }
+.social-links a:has(img):hover, .social-links a:has(img):focus-visible { background: var(--surface); border-color: var(--brand, var(--orange)); }
+
 .footer-bottom { border-top: 1px solid var(--border); padding-block: 14px; font-size: 13px; color: var(--muted); text-align: center; }
 
 /* ==========================================================
@@ -563,13 +642,18 @@ textarea.input { resize: vertical; min-height: 120px; line-height: 1.9; }
     .section-head { padding-inline: 18px; }
     .section-head .more { left: 14px; font-size: 12.5px; }
     .post-header, .post-content, .post-footer { padding-inline: 18px; }
-    .post-media, .post-audio { margin-inline: 18px; }
-    .post-audio { grid-template-columns: 1fr; }
-    .post-audio .cover { max-width: 200px; }
+    .post-media, .audio-player, .media-missing { margin-inline: 18px; }
+    .media-missing { aspect-ratio: 4 / 3; }
+    .post-media.is-poster { margin-inline: 18px; }
+    .audio-player { grid-template-columns: 1fr; padding: 16px; gap: 14px; text-align: center; }
+    .audio-player-cover { max-width: 180px; width: 100%; margin-inline: auto; }
+    .audio-player-controls .audio-play { width: 54px; height: 54px; }
+    .audio-player-time { padding-left: 70px; }
     .form-row { grid-template-columns: 1fr; }
     .auth-form { padding: 26px 20px; }
     .profile-head { flex-direction: column; text-align: center; }
     .footer-inner { flex-direction: column; text-align: center; }
+    .footer-links, .social-links { justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -577,3 +661,7 @@ textarea.input { resize: vertical; min-height: 120px; line-height: 1.9; }
 }
 
 .slide > a { display: block; height: 100%; }
+
+/* فرم‌ساز (پکیج hamin/form-builder): هماهنگی رنگ‌ها با سایت */
+.fb-form { --fb-accent: var(--orange); --fb-border: var(--border); --fb-locked-bg: var(--surface-2); --fb-muted: var(--muted); --fb-radius: var(--radius-sm); }
+.fb-page { --fb-page-border: var(--border); --fb-page-muted: var(--muted); --fb-page-radius: var(--radius); }

@@ -81,7 +81,13 @@
         const btn = card.querySelector('.audio-play');
         const wave = card.querySelector('.wave');
         const time = card.querySelector('.audio-time');
+        const current = card.querySelector('.audio-current'); // فقط در پخش‌کننده صفحه مطلب
         if (!audio || !btn) return;
+
+        // در پخش‌کننده بزرگ: زمان سپری‌شده جدا و مدت کل ثابت نمایش داده می‌شود
+        if (current) {
+            audio.addEventListener('timeupdate', () => (current.textContent = format(audio.currentTime)));
+        }
 
         btn.addEventListener('click', () => {
             if (audio.paused) {
@@ -102,7 +108,7 @@
         audio.addEventListener('timeupdate', () => {
             const p = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
             wave && wave.style.setProperty('--progress', p + '%');
-            time && (time.textContent = format(audio.paused ? audio.duration : audio.currentTime));
+            if (time && !current) time.textContent = format(audio.paused ? audio.duration : audio.currentTime);
         });
         audio.addEventListener('ended', () => wave && wave.style.setProperty('--progress', '0%'));
 
@@ -111,6 +117,40 @@
             if (!audio.duration) return;
             const r = wave.getBoundingClientRect();
             audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+        });
+    });
+
+    // ---------- مدت صوت یا ویدیو در «مشخصات اثر» ----------
+    const durationBox = document.querySelector('[data-media-duration]');
+    const mainMedia = document.querySelector('.post-article audio, .post-article video');
+
+    if (durationBox && mainMedia) {
+        const show = () => {
+            const s = Math.round(mainMedia.duration);
+            if (!isFinite(s)) return;
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            durationBox.textContent = (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s % 60).padStart(2, '0');
+        };
+        mainMedia.readyState >= 1 ? show() : mainMedia.addEventListener('loadedmetadata', show);
+    }
+
+    // ---------- کپی لینک ----------
+    document.querySelectorAll('[data-copy]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const label = btn.querySelector('span');
+            try {
+                await navigator.clipboard.writeText(btn.dataset.copy);
+            } catch (e) {
+                window.prompt('لینک را کپی کنید:', btn.dataset.copy);
+                return;
+            }
+            btn.classList.add('copied');
+            if (label) label.textContent = 'کپی شد';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                if (label) label.textContent = 'کپی لینک';
+            }, 2000);
         });
     });
 })();

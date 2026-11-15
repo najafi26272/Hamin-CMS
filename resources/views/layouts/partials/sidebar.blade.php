@@ -165,12 +165,34 @@
                 </li>
             @endcan
 
-            @can('manage-sliders')
+            @can('manage-forms')
+                <li class="nav-item nav-category">فرم‌ها</li>
+                <li @class(['nav-item', 'active' => request()->routeIs('form-builder.admin.*')])>
+                    <a href="{{ route('form-builder.admin.forms.index') }}" class="nav-link">
+                        <i class="link-icon" data-feather="clipboard"></i>
+                        <span class="link-title">فرم‌ساز</span>
+                    </a>
+                </li>
+            @endcan
+
+            @canany(['manage-sliders', 'manage-social-links'])
                 <li class="nav-item nav-category">ظاهر سایت</li>
+            @endcanany
+
+            @can('manage-sliders')
                 <li @class(['nav-item', 'active' => request()->routeIs('sliders.*')])>
                     <a href="{{route('sliders.index')}}" class="nav-link">
                         <i class="link-icon" data-feather="layers"></i>
                         <span class="link-title">اسلایدرها</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('manage-social-links')
+                <li @class(['nav-item', 'active' => request()->routeIs('social-links.*')])>
+                    <a href="{{route('social-links.index')}}" class="nav-link">
+                        <i class="link-icon" data-feather="share-2"></i>
+                        <span class="link-title">شبکه‌های اجتماعی</span>
                     </a>
                 </li>
             @endcan

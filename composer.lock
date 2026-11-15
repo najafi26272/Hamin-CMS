@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "af8eb49e61bea9c2a90339a13b6f7e61",
+    "content-hash": "737c257416ae2771f1ea2a58705955ef",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -1125,6 +1125,43 @@
                 }
             ],
             "time": "2026-08-24T17:13:02+00:00"
+        },
+        {
+            "name": "hamin/form-builder",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/hamin/form-builder",
+                "reference": "8b653b34552895b7f87a9ece0dc5bd13a8b3400c"
+            },
+            "require": {
+                "illuminate/support": "^11.0|^12.0|^13.0",
+                "php": "^8.2"
+            },
+            "suggest": {
+                "livewire/livewire": "برای پنل مدیریت و نمایش فرم آماده (^3.0|^4.0)",
+                "morilog/jalali": "برای نمایش تاریخ‌ها به شمسی"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Hamin\\FormBuilder\\FormBuilderServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hamin\\FormBuilder\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "فرم‌ساز قابل حمل برای لاراول: فیلدهای خام و فیلدهای پروفایل کاربر، پنل Livewire و API JSON",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "laravel/framework",
@@ -8773,7 +8810,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "hamin/form-builder": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

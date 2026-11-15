@@ -85,7 +85,52 @@ class SiteController extends Controller
         $related = Post::published()->where('type', $post->type)->whereKeyNot($post->id)
             ->latest('published_at')->take(4)->get();
 
-        return view('site.post', compact('post', 'comments', 'related'));
+        $media = $this->mediaInfo($post);
+
+        // تصویر کاور: پوستر مطلب، یا خود تصویر اصلی در لوح
+        $cover = $post->image_url ?? ($post->type === 'visual' ? $media['url'] ?? null : null);
+
+        // متن صوتی‌ها می‌تواند توضیحات یا متن شعر باشد؛ چند سطر کوتاه یعنی شعر
+        $looksLikePoem = $this->looksLikePoem($post->content);
+
+        return view('site.post', compact('post', 'comments', 'related', 'media', 'cover', 'looksLikePoem'));
+    }
+
+    // اطلاعات فایل اصلی مطلب؛ null اگر فایلی ثبت نشده یا روی دیسک وجود ندارد
+    private function mediaInfo(Post $post): ?array
+    {
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+
+        if (! $post->media_file || ! $disk->exists($post->media_file)) {
+            return null;
+        }
+
+        $bytes = $disk->size($post->media_file);
+        $size = match (true) {
+            $bytes >= 1048576 => round($bytes / 1048576, 1).' مگابایت',
+            $bytes >= 1024 => round($bytes / 1024).' کیلوبایت',
+            default => $bytes.' بایت',
+        };
+
+        $dimensions = null;
+        if ($post->type === 'visual' && ($info = @getimagesize($disk->path($post->media_file)))) {
+            $dimensions = $info[0].' × '.$info[1].' پیکسل';
+        }
+
+        return [
+            'url' => $post->media_url,
+            'format' => strtoupper(pathinfo($post->media_file, PATHINFO_EXTENSION)),
+            'size' => $size,
+            'dimensions' => $dimensions,
+        ];
+    }
+
+    private function looksLikePoem(?string $html): bool
+    {
+        preg_match_all('#<p[^>]*>(.*?)</p>#su', (string) $html, $m);
+        $lines = array_filter(array_map(fn ($l) => trim(strip_tags($l)), $m[1]));
+
+        return count($lines) >= 4 && collect($lines)->every(fn ($l) => mb_strlen($l) <= 90);
     }
 
     public function storeComment(Request $request, Post $post)

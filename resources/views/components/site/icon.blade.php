@@ -27,6 +27,16 @@
         'grid' => '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
         'instagram' => '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>',
         'send' => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+        'link' => '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+        'check' => '<polyline points="20 6 9 17 4 12"/>',
+
+        // شبکه‌های اجتماعی (تلگرام، اینستاگرام، واتساپ و یوتیوب از Tabler Icons با مجوز MIT؛ ایتا و آپارات ساده‌شده)
+        'social-telegram' => '<path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"/>',
+        'social-instagram' => '<path d="M4 8a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M16.5 7.5v.01"/>',
+        'social-whatsapp' => '<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"/>',
+        'social-youtube' => '<path d="M2 8a4 4 0 0 1 4 -4h12a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-12a4 4 0 0 1 -4 -4v-8z"/><path d="M10 9l5 3l-5 3z"/>',
+        'social-aparat' => '<circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="8.6" r="1.6"/><circle cx="15.4" cy="9" r="1.6"/><circle cx="8.6" cy="15" r="1.6"/><circle cx="15" cy="15.4" r="1.6"/>',
+        'social-eitaa' => '<path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-6l-5 4v-4h-3a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2z"/><path d="M9 10.5h6a3 3 0 1 0 -1 2.2"/>',
     ];
 @endphp
 <svg {{ $attributes->merge(['class' => 'icon']) }} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $paths[$name] ?? '' !!}</svg>
