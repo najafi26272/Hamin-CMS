@@ -23,6 +23,9 @@ class SiteController extends Controller
 
         return view('site.home', [
             'sliders' => Slider::active()->get(),
+            // تعداد آثار منتشرشده هر قالب برای باکس‌های زیر اسلایدر
+            'typeCounts' => Post::published()->whereIn('type', ['visual', 'audio', 'video', 'poem'])
+                ->selectRaw('type, count(*) as total')->groupBy('type')->pluck('total', 'type'),
             'visuals' => $latest('visual', 4),
             'audios' => $latest('audio', 2),
             'videos' => $latest('video', 2),

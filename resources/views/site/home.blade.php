@@ -39,6 +39,29 @@
         </div>
     </section>
 
+    {{-- قالب‌های محتوایی: هر باکس به لیست همان قالب می‌رود --}}
+    @php
+        $typeBoxes = [
+            'visual' => ['icon' => 'image', 'text' => 'عکس، نقاشی و خوشنویسی', 'tone' => 'orange'],
+            'audio' => ['icon' => 'headphones', 'text' => 'موسیقی، دکلمه و آثار صوتی', 'tone' => 'teal'],
+            'video' => ['icon' => 'film', 'text' => 'فیلم، کلیپ و مستند', 'tone' => 'orange'],
+            'poem' => ['icon' => 'feather', 'text' => 'سروده‌ها و متن‌های ادبی', 'tone' => 'teal'],
+        ];
+    @endphp
+    <nav class="type-boxes" aria-label="قالب‌های محتوایی">
+        @foreach ($typeBoxes as $type => $box)
+            <a href="{{ route('site.posts', ['type' => $type]) }}" class="type-box type-box-{{ $box['tone'] }}">
+                <span class="type-box-icon"><x-site.icon :name="$box['icon']" /></span>
+                <span class="type-box-body">
+                    <strong>{{ \App\Models\Post::TYPES[$type]['label'] }}</strong>
+                    <small>{{ $box['text'] }}</small>
+                </span>
+                <span class="type-box-count">{{ $typeCounts[$type] ?? 0 }} اثر</span>
+                <x-site.icon name="chevron-left" class="type-box-arrow" />
+            </a>
+        @endforeach
+    </nav>
+
     {{-- لوح --}}
     @if ($visuals->isNotEmpty())
         <section class="section">
