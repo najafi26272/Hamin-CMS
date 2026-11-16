@@ -24,6 +24,8 @@ new #[Layout('layouts::admin')] class extends Component
     public ?int $starts_at = null;       // unix timestamp (ثانیه)؛ در تقویم شمسی و ساعت تهران نمایش داده می‌شود
     public ?int $ends_at = null;
     public bool $is_active = true;
+    public string $link = '';           // لینک دکمه «شرکت در رویداد»
+    public string $link_label = '';
 
     // اگر کاربر slug را دستی تغییر دهد، دیگر از روی عنوان ساخته نمی‌شود
     public bool $slugTouched = false;
@@ -42,6 +44,8 @@ new #[Layout('layouts::admin')] class extends Component
         $this->starts_at = $event->starts_at->timestamp;
         $this->ends_at = $event->ends_at->timestamp;
         $this->is_active = $event->is_active;
+        $this->link = (string) $event->link;
+        $this->link_label = (string) $event->link_label;
 
         // در ویرایش، slug قبلی حفظ می‌شود تا آدرس‌ها تغییر نکنند
         $this->slugTouched = true;
@@ -89,6 +93,8 @@ new #[Layout('layouts::admin')] class extends Component
             'starts_at' => ['required', 'integer'],
             'ends_at' => ['required', 'integer', 'gte:starts_at'],
             'is_active' => ['boolean'],
+            'link' => ['nullable', 'max:500', 'regex:/^https?:\/\/\S+$/i'],
+            'link_label' => ['nullable', 'string', 'max:50'],
         ];
     }
 
@@ -106,6 +112,7 @@ new #[Layout('layouts::admin')] class extends Component
             'poster.image' => 'فایل انتخاب شده باید تصویر باشد.',
             'poster.mimes' => 'فرمت پوستر باید jpg، png یا webp باشد.',
             'poster.max' => 'حجم پوستر نباید بیشتر از ۴ مگابایت باشد.',
+            'link.regex' => 'لینک باید کامل و با http:// یا https:// شروع شود.',
         ];
     }
 
@@ -118,6 +125,8 @@ new #[Layout('layouts::admin')] class extends Component
             'poster' => 'پوستر',
             'starts_at' => 'تاریخ شروع',
             'ends_at' => 'تاریخ پایان',
+            'link' => 'لینک شرکت',
+            'link_label' => 'متن دکمه',
         ];
     }
 
@@ -125,6 +134,8 @@ new #[Layout('layouts::admin')] class extends Component
     {
         // slug دستی هم با همان قوانین استاندارد اصلاح می‌شود
         $this->slug = Event::makeSlug($this->slug);
+        $this->link = trim($this->link);
+        $this->link_label = trim($this->link_label);
 
         try {
             $this->validate();
@@ -140,6 +151,8 @@ new #[Layout('layouts::admin')] class extends Component
             'starts_at' => Carbon::createFromTimestamp($this->starts_at),
             'ends_at' => Carbon::createFromTimestamp($this->ends_at),
             'is_active' => $this->is_active,
+            'link' => $this->link ?: null,
+            'link_label' => $this->link_label ?: null,
         ];
 
         $oldPoster = $this->event?->poster;
@@ -264,6 +277,28 @@ new #[Layout('layouts::admin')] class extends Component
                             <span wire:loading.remove wire:target="save">{{ $event ? 'ذخیره تغییرات' : 'ثبت رویداد' }}</span>
                             <span wire:loading wire:target="save">در حال ذخیره...</span>
                         </button>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">شرکت در رویداد</h6>
+
+                        <div class="mb-3">
+                            <label for="link" class="form-label">لینک</label>
+                            <input type="url" id="link" wire:model.blur="link" dir="ltr"
+                                   class="form-control text-start @error('link') is-invalid @enderror" placeholder="https://...">
+                            @error('link') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="link_label" class="form-label">متن دکمه</label>
+                            <input type="text" id="link_label" wire:model="link_label" maxlength="50"
+                                   class="form-control @error('link_label') is-invalid @enderror" placeholder="شرکت در رویداد">
+                            @error('link_label') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <p class="text-muted small mb-0">اختیاری — لینک ثبت‌نام، جلسه آنلاین یا فرم. اگر لینک وارد شود، دکمه در صفحه رویداد نمایش داده می‌شود و پس از پایان رویداد مخفی می‌شود.</p>
                     </div>
                 </div>
 

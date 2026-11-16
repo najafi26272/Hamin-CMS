@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // حالت توسعه سایت (پنل ← تنظیمات سایت)
+        $middleware->web(append: [\App\Http\Middleware\SiteMaintenance::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

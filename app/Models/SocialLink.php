@@ -18,6 +18,7 @@ class SocialLink extends Model
         'whatsapp' => ['label' => 'واتساپ', 'color' => '#25d366', 'placeholder' => 'https://wa.me/989121234567'],
         'aparat' => ['label' => 'آپارات', 'color' => '#ed145b', 'placeholder' => 'https://www.aparat.com/username'],
         'youtube' => ['label' => 'یوتیوب', 'color' => '#ff0000', 'placeholder' => 'https://www.youtube.com/@username'],
+        'splus' => ['label' => 'سروش', 'color' => '#196ff0;', 'placeholder' => 'https://splus.ir/@username'],
     ];
 
     protected $fillable = ['platform', 'url', 'icon', 'is_active', 'sort_order'];

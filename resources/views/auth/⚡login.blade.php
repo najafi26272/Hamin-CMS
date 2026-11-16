@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -50,6 +51,15 @@ new #[Layout('layouts::site', ['title' => 'ورود'])] class extends Component
 
         RateLimiter::clear($this->throttleKey());
 
+        // حالت توسعه: فقط مدیر اصلی و نویسندگان
+        if (Setting::maintenance() && ! Auth::user()->canBypassMaintenance()) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'username' => 'سایت در حال توسعه است؛ در این مدت فقط مدیران و نویسندگان می‌توانند وارد شوند.',
+            ]);
+        }
+
         session()->regenerate();
 
         return $this->redirectIntended(route('dashboard'));
@@ -87,6 +97,11 @@ new #[Layout('layouts::site', ['title' => 'ورود'])] class extends Component
                 @if (session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
                 @endif
+                @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @elseif (\App\Models\Setting::maintenance())
+                    <div class="alert alert-info">سایت در حال توسعه است؛ در این مدت فقط مدیران و نویسندگان می‌توانند وارد شوند.</div>
+                @endif
 
                 <div class="field">
                     <label for="username">نام کاربری</label>
@@ -112,11 +127,13 @@ new #[Layout('layouts::site', ['title' => 'ورود'])] class extends Component
                 </button>
             </form>
 
-            <p class="auth-switch">حساب کاربری ندارید؟ <a href="{{ route('register') }}">عضو شوید</a></p>
+            @unless (\App\Models\Setting::maintenance())
+                <p class="auth-switch">حساب کاربری ندارید؟ <a href="{{ route('register') }}">عضو شوید</a></p>
+            @endunless
         </div>
 
         <div class="auth-side">
-            <h2>مجمع هنری هامین</h2>
+            <h2>{{ \App\Models\Setting::siteTitle() }}</h2>
             <p>آثار خود را در لوح، شنیداری، تماشایی و شعر با دیگران به اشتراک بگذارید.</p>
         </div>
     </div>

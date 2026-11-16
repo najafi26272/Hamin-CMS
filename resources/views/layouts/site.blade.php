@@ -11,10 +11,13 @@
     <meta name="theme-color" content="#19786f">
     @php
         $pageTitle = trim($__env->yieldContent('title')) ?: ($title ?? null);
+        $siteTitle = \App\Models\Setting::siteTitle();
+        $siteDescription = \App\Models\Setting::siteDescription();
+        $logoUrl = \App\Models\Setting::logoUrl();
     @endphp
-    <title>{{ $pageTitle ? $pageTitle.' | ' : '' }}مجمع هنری هامین</title>
-    <meta name="description" content="@yield('description', 'مجمع هنری هامین؛ لوح، شنیداری، تماشایی، شعر و رویدادهای هنری')">
-    <link rel="icon" type="image/png" href="{{ asset('assets/front/images/icon.png') }}">
+    <title>{{ $pageTitle ? $pageTitle.' | ' : '' }}{{ $siteTitle }}</title>
+    <meta name="description" content="@yield('description', $siteDescription)">
+    <link rel="icon" href="{{ \App\Models\Setting::faviconUrl() }}">
     <link rel="preload" href="{{ asset('assets/front/fonts/Vazirmatn-Variable.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('assets/front/css/site.css') }}?v={{ filemtime(public_path('assets/front/css/site.css')) }}">
     @stack('head')
@@ -26,10 +29,20 @@
     $menuCategories = \App\Models\Category::whereNull('parent_id')->with(['children' => fn ($q) => $q->orderBy('name')])->orderBy('name')->get();
 @endphp
 
+{{-- حالت توسعه: فقط مدیران و نویسندگان سایت را می‌بینند --}}
+@if (\App\Models\Setting::maintenance() && auth()->check())
+    <div class="maintenance-bar">
+        حالت توسعه فعال است؛ بازدیدکنندگان صفحه «در حال توسعه» را می‌بینند.
+        @can('manage-settings')
+            <a href="{{ route('settings.index') }}">تنظیمات سایت</a>
+        @endcan
+    </div>
+@endif
+
 <header class="container">
     <div class="site-top">
-        <a href="{{ route('site.home') }}" class="site-logo" aria-label="مجمع هنری هامین - صفحه اصلی">
-            <img src="{{ asset('assets/front/images/logo.png') }}" alt="مجمع هنری هامین" width="452" height="108">
+        <a href="{{ route('site.home') }}" class="site-logo" aria-label="{{ $siteTitle }} - صفحه اصلی">
+            <img src="{{ $logoUrl }}" alt="{{ $siteTitle }}">
         </a>
 
         <div class="top-actions">
@@ -41,7 +54,9 @@
                 <a href="{{ route('logout') }}" class="login" style="font-size: 14px">خروج</a>
             @else
                 <a href="{{ route('login') }}" class="login">ورود</a>
-                <a href="{{ route('register') }}" class="register">عضویت</a>
+                @unless (\App\Models\Setting::maintenance())
+                    <a href="{{ route('register') }}" class="register">عضویت</a>
+                @endunless
             @endauth
         </div>
     </div>
@@ -86,7 +101,7 @@
 
 <footer class="site-footer">
     <div class="container footer-inner">
-        <a href="{{ route('site.home') }}"><img src="{{ asset('assets/front/images/logo.png') }}" alt="مجمع هنری هامین" width="167" height="40"></a>
+        <a href="{{ route('site.home') }}"><img src="{{ $logoUrl }}" alt="{{ $siteTitle }}" class="footer-logo"></a>
         <ul class="footer-links">
             @foreach (\App\Models\Post::TYPES as $key => $type)
                 <li><a href="{{ route('site.posts', ['type' => $key]) }}">{{ $type['label'] }}</a></li>
@@ -99,7 +114,7 @@
         </div>
     </div>
     <div class="footer-bottom">
-        <div class="container">© {{ jdate()->format('Y') }} مجمع هنری هامین — همه حقوق محفوظ است.</div>
+        <div class="container">© {{ jdate()->format('Y') }} {{ $siteTitle }} — همه حقوق محفوظ است.</div>
     </div>
 </footer>
 

@@ -116,6 +116,12 @@ class User extends Authenticatable
         return $this->roles->contains('name', 'admin');
     }
 
+    // در حالت توسعه سایت فقط این کاربران (مدیر اصلی و نویسندگان) وارد می‌شوند و سایت را می‌بینند
+    public function canBypassMaintenance(): bool
+    {
+        return $this->roles->contains(fn ($role) => in_array($role->name, Setting::MAINTENANCE_ROLES, true));
+    }
+
     // آیا یکی از نقش‌های کاربر این مجوز را دارد؟
     public function hasPermission(string $name): bool
     {

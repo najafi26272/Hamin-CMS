@@ -21,8 +21,8 @@
                 </div>
             @empty
                 <div class="hero-fallback">
-                    <img src="{{ asset('assets/front/images/icon.png') }}" alt="">
-                    <h1 style="margin: 0; font-size: 22px">مجمع هنری هامین</h1>
+                    <img src="{{ \App\Models\Setting::faviconUrl() }}" alt="">
+                    <h1 style="margin: 0; font-size: 22px">{{ \App\Models\Setting::siteTitle() }}</h1>
                     <p>خانه‌ای برای لوح، شنیداری، تماشایی و شعر</p>
                 </div>
             @endforelse

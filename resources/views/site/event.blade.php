@@ -30,6 +30,12 @@
                     <li><x-site.icon name="calendar" /> شروع: {{ $event->jalali('starts_at', 'l j F Y — H:i') }}</li>
                     <li><x-site.icon name="clock" /> پایان: {{ $event->jalali('ends_at', 'l j F Y — H:i') }}</li>
                 </ul>
+
+                @if ($event->can_join)
+                    <a href="{{ $event->link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary event-join">
+                        <x-site.icon name="log-in" /> {{ $event->join_label }}
+                    </a>
+                @endif
             </header>
 
             @if (trim(strip_tags((string) $event->description)) !== '')

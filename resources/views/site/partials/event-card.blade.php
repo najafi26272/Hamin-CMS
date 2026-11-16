@@ -11,6 +11,11 @@
     </a>
     <div class="card-body">
         <h3 class="card-title"><a href="{{ route('site.event', $event) }}">{{ $event->title }}</a></h3>
-        <span class="timing timing-{{ $event->timing }}">{{ $timings[$event->timing] }}</span>
+        <div class="event-card-foot">
+            <span class="timing timing-{{ $event->timing }}">{{ $timings[$event->timing] }}</span>
+            @if ($event->can_join)
+                <a href="{{ $event->link }}" target="_blank" rel="noopener noreferrer" class="event-join-sm">{{ $event->join_label }}</a>
+            @endif
+        </div>
     </div>
 </article>

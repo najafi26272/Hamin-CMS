@@ -1,7 +1,10 @@
 <nav class="sidebar">
+    @php
+        $logoUrl = \App\Models\Setting::logoUrl();
+    @endphp
     <div class="sidebar-header">
         <a href="/" class="sidebar-brand">
-            HAMIN
+            <img width="120" src="{{ $logoUrl }}" alt="لوگو">
         </a>
         <div class="sidebar-toggler">
             <span></span>
@@ -48,7 +51,8 @@
                         <span class="link-title">لیست کاربران</span>
                         @php($pendingUsers = \App\Models\User::where('artist_status', 'pending')->count())
                         @if ($pendingUsers)
-                            <span class="badge bg-danger ms-auto" title="درخواست‌های هنرمندی در انتظار">{{ $pendingUsers }}</span>
+                            <span class="badge bg-danger ms-auto"
+                                  title="درخواست‌های هنرمندی در انتظار">{{ $pendingUsers }}</span>
                         @endif
                     </a>
                 </li>
@@ -96,7 +100,8 @@
                 <li @class(['nav-item', 'active' => request()->routeIs('posts.index', 'posts.edit')])>
                     <a href="{{route('posts.index')}}" class="nav-link">
                         <i class="link-icon" data-feather="list"></i>
-                        <span class="link-title">{{ auth()->user()->canAny(['view-content', 'review-content']) ? 'لیست مطالب' : 'مطالب من' }}</span>
+                        <span
+                            class="link-title">{{ auth()->user()->canAny(['view-content', 'review-content']) ? 'لیست مطالب' : 'مطالب من' }}</span>
                         @can('review-content')
                             @php($pendingPosts = \App\Models\Post::where('status', 'pending')->count())
                             @if ($pendingPosts)
@@ -175,27 +180,41 @@
                 </li>
             @endcan
 
-            @canany(['manage-sliders', 'manage-social-links'])
-                <li class="nav-item nav-category">ظاهر سایت</li>
+            {{-- تنظیمات سایت: تنظیمات عمومی، اسلایدرها و شبکه‌های اجتماعی --}}
+            @canany(['manage-settings', 'manage-sliders', 'manage-social-links'])
+                @php($settingsOpen = request()->routeIs('settings.*', 'sliders.*', 'social-links.*'))
+
+                <li class="nav-item nav-category">تنظیمات
+
+                    @if (\App\Models\Setting::maintenance())
+                        <span class="badge bg-warning text-dark ms-auto me-1" title="حالت توسعه فعال است">حالت توسعه</span>
+                    @endif
+                </li>
+                @can('manage-settings')
+                    <li class="nav-item">
+                        <a href="{{ route('settings.index') }}" @class(['nav-link', 'active' => request()->routeIs('settings.*')])>
+                            <i class="link-icon" data-feather="settings"></i>
+                            <span class="link-title">تنظیمات عمومی</span>
+                        </a>
+                    </li>
+                @endcan
+                @can('manage-sliders')
+                    <li class="nav-item">
+                        <a href="{{ route('sliders.index') }}" @class(['nav-link', 'active' => request()->routeIs('sliders.*')])>
+                            <i class="link-icon" data-feather="align-justify"></i>
+                            <span class="link-title">اسلایدرها</span>
+                        </a>
+                    </li>
+                @endcan
+                @can('manage-social-links')
+                    <li class="nav-item">
+                        <a href="{{ route('social-links.index') }}" @class(['nav-link', 'active' => request()->routeIs('social-links.*')])>
+                            <i class="link-icon" data-feather="share-2"></i>
+                            <span class="link-title">شبکه‌های اجتماعی</span>
+                        </a>
+                    </li>
+                @endcan
             @endcanany
-
-            @can('manage-sliders')
-                <li @class(['nav-item', 'active' => request()->routeIs('sliders.*')])>
-                    <a href="{{route('sliders.index')}}" class="nav-link">
-                        <i class="link-icon" data-feather="layers"></i>
-                        <span class="link-title">اسلایدرها</span>
-                    </a>
-                </li>
-            @endcan
-
-            @can('manage-social-links')
-                <li @class(['nav-item', 'active' => request()->routeIs('social-links.*')])>
-                    <a href="{{route('social-links.index')}}" class="nav-link">
-                        <i class="link-icon" data-feather="share-2"></i>
-                        <span class="link-title">شبکه‌های اجتماعی</span>
-                    </a>
-                </li>
-            @endcan
 
             <li class="nav-item nav-category">خروج از سامانه</li>
 

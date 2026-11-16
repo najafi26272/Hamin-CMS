@@ -11,7 +11,7 @@ class Event extends Model
 {
     use HasSlug, SoftDeletes;
 
-    protected $fillable = ['user_id', 'title', 'slug', 'description', 'poster', 'starts_at', 'ends_at', 'is_active'];
+    protected $fillable = ['user_id', 'title', 'slug', 'description', 'poster', 'link', 'link_label', 'starts_at', 'ends_at', 'is_active'];
 
     protected function casts(): array
     {
@@ -36,6 +36,17 @@ class Event extends Model
     public function getPosterUrlAttribute(): ?string
     {
         return $this->poster ? Storage::disk('public')->url($this->poster) : null;
+    }
+
+    // دکمه «شرکت در رویداد» فقط وقتی لینک دارد و رویداد تمام نشده است
+    public function getCanJoinAttribute(): bool
+    {
+        return filled($this->link) && $this->timing !== 'finished';
+    }
+
+    public function getJoinLabelAttribute(): string
+    {
+        return $this->link_label ?: 'شرکت در رویداد';
     }
 
     // زمان‌بندی رویداد: upcoming (پیش رو)، ongoing (در حال برگزاری)، finished (پایان یافته)

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>پنل مدیریت</title>
+    <title>پنل مدیریت | {{ \App\Models\Setting::siteTitle() }}</title>
 
     <!-- color-modes:js -->
     <script src="{{asset("assets/admin/js/color-modes.js")}}"></script>
@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="{{asset("assets/admin/css/demo1/style-rtl.css")}}">
     <!-- End layouts styles -->
 
-    <link rel="icon" type="image/x-icon" href="{{asset("assets/general/img/color-logo.png")}}">
+    <link rel="icon" href="{{ \App\Models\Setting::faviconUrl() }}">
     <link rel="stylesheet" href="{{asset("assets/admin/vendors/sweetalert2/sweetalert2.min.css")}}">
 
     @stack('css')
