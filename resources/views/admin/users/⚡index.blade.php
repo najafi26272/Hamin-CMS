@@ -255,7 +255,6 @@ new  #[Layout('layouts::admin')] class extends Component {
                     <tr>
                         <th>#</th>
                         <th>نام و نام خانوادگی</th>
-                        <th>نام کاربری</th>
                         <th>موبایل</th>
                         <th>ایمیل</th>
                         <th>شهر</th>
@@ -279,7 +278,6 @@ new  #[Layout('layouts::admin')] class extends Component {
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ $user->username }}</td>
                             <td>{{ $user->mobile ?? '—' }}</td>
                             <td>{{ $user->email ?? '—' }}</td>
                             <td>{{ $user->city ?? '—' }}</td>
@@ -459,41 +457,3 @@ new  #[Layout('layouts::admin')] class extends Component {
     @endif
 </div>
 
-@assets
-<style>
-    .user-row {
-        cursor: pointer;
-    }
-
-    .user-detail {
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-        padding: 10px 12px;
-        border: 1px solid var(--bs-border-color);
-        border-radius: 8px;
-        height: 100%;
-    }
-
-    .user-detail-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 8px;
-        background: rgba(101, 113, 255, .12);
-        color: #6571ff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .user-detail-icon svg {
-        width: 17px;
-        height: 17px;
-    }
-
-    .min-w-0 {
-        min-width: 0;
-    }
-</style>
-@endassets

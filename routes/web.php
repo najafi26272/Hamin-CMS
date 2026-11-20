@@ -20,6 +20,7 @@ Route::livewire('/register', 'auth::register')
 // پنل مدیریت و کاربری زیر /panel (تا با آدرس‌های سایت عمومی مثل /posts و /events تداخل نداشته باشد)
 Route::middleware('auth')->prefix('panel')->group(function () {
     Route::livewire('/dashboard', 'admin::dashboard')->name('dashboard');
+    Route::livewire('/profile/{user}/edit', 'admin::profile.form')->name('profile.edit');
 
     // درخواست هنرمندی (برای همه کاربران واردشده)
     Route::livewire('/artist-request', 'admin::artist.apply')->name('artist.apply');

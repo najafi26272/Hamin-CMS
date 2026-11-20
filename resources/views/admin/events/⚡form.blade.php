@@ -252,7 +252,7 @@ new #[Layout('layouts::admin')] class extends Component
 
                         <div class="mb-1">
                             <label class="form-label">توضیحات</label>
-                            <div wire:ignore>
+                            <div wire:ignore class="editor-md">
                                 <div id="description-editor"></div>
                             </div>
                             @error('description') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -343,56 +343,6 @@ new #[Layout('layouts::admin')] class extends Component
 @assets
 <script src="{{ asset('assets/admin/vendors/ckeditor5/ckeditor5.umd.js') }}"></script>
 <script src="{{ asset('assets/admin/vendors/ckeditor5/translations/fa.umd.js') }}"></script>
-<style>
-    .poster-upload {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        aspect-ratio: 3 / 4;
-        border: 2px dashed var(--bs-border-color);
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: pointer;
-    }
-
-    .poster-upload img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .poster-loading {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, .45);
-        align-items: center;
-        justify-content: center;
-    }
-
-    .poster-remove {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        width: 28px;
-        height: 28px;
-        padding: 0;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .poster-remove svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .ck.ck-editor__editable_inline {
-        min-height: 250px;
-    }
-</style>
 @endassets
 
 @script

@@ -41,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         // مطالب: کارکنان همه مطالب را می‌بینند، هنرمندان (ارسال مطلب) فقط مطالب خودشان را
         Gate::define('list-posts', fn (User $user) => Gate::forUser($user)->any(['view-content', 'review-content', 'submit-content']));
         Gate::define('create-post', fn (User $user) => $user->hasPermission('manage-content') || $user->hasPermission('submit-content'));
+        Gate::define('choose-author', fn (User $user) => $user->hasPermission('choose-author') );
         Gate::define('update-post', fn (User $user, Post $post) => $user->hasPermission('edit-content')
             || $user->hasPermission('review-content')
             || ($user->hasPermission('submit-content') && $post->user_id === $user->id));

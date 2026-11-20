@@ -2,6 +2,11 @@
 @props(['name'])
 @php
     $paths = [
+        'home'=>'<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m3 10 9-7 9 7"></path>
+                    <path d="M5 9v11h14V9"></path>
+                    <path d="M9 20v-7h6v7"></path>
+                </svg>',
         'search' => '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
         'menu' => '<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
         'chevron-down' => '<polyline points="6 9 12 15 18 9"/>',
@@ -41,4 +46,5 @@
         'social-eitaa' => '<path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-6l-5 4v-4h-3a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2z"/><path d="M9 10.5h6a3 3 0 1 0 -1 2.2"/>',
     ];
 @endphp
-<svg {{ $attributes->merge(['class' => 'icon']) }} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $paths[$name] ?? '' !!}</svg>
+<svg {{ $attributes->merge(['class' => 'icon']) }} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $paths[$name] ?? '' !!}</svg>

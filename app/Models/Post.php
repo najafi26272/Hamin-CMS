@@ -29,7 +29,7 @@ class Post extends Model
             'content_label' => 'متن خبر', 'content_required' => true, 'poster_label' => 'تصویر شاخص',
         ],
         'visual' => [
-            'label' => 'لوح', 'icon' => 'image', 'creator' => 'نام صاحب اثر', 'media' => 'image', 'media_label' => 'فایل اصلی (عکس یا پوستر)',
+            'label' => 'لوح', 'icon' => 'image', 'creator' => 'نام صاحب اثر', 'media' => 'image', 'media_label' => 'فایل (عکس یا پوستر)',
             'content_label' => 'توضیحات', 'content_required' => false, 'poster_label' => 'پوستر نمایشی برای لیست محتوا',
         ],
         'audio' => [
@@ -38,7 +38,7 @@ class Post extends Model
         ],
         'video' => [
             'label' => 'تماشایی', 'icon' => 'film', 'creator' => 'نام سازنده', 'media' => 'video', 'media_label' => 'فایل ویدیو',
-            'content_label' => 'توضیحات', 'content_required' => false, 'poster_label' => 'فایل پوستر',
+            'content_label' => 'توضیحات', 'content_required' => false, 'poster_label' => 'فایل پوستر' ,'aparat_hash' => 'کد آپارات',
         ],
         'poem' => [
             'label' => 'شعر', 'icon' => 'feather', 'creator' => 'نام شاعر', 'media' => null,
@@ -47,8 +47,8 @@ class Post extends Model
     ];
 
     protected $fillable = [
-        'user_id', 'type', 'title', 'slug', 'creator_name', 'content', 'image', 'media_file', 'status', 'published_at',
-        'rejection_reason', 'reviewed_at', 'reviewed_by',
+        'user_id', 'main_user_id', 'type', 'title', 'slug', 'creator_name', 'content', 'image', 'media_file', 'status', 'published_at',
+        'rejection_reason', 'reviewed_at', 'reviewed_by', 'media_file_main_size', 'main_file', 'main_file_name','file_link','aparat_hash'
     ];
 
     protected function casts(): array
@@ -62,6 +62,12 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // کاربری که واقعا مطلب را ثبت کرده (ممکن است با user_id که ثبت‌کننده‌ی انتخاب‌شده است فرق داشته باشد)
+    public function mainUser()
+    {
+        return $this->belongsTo(User::class, 'main_user_id');
     }
 
     public function reviewer()
@@ -114,6 +120,26 @@ class Post extends Model
     public function getMediaUrlAttribute(): ?string
     {
         return $this->media_file ? Storage::disk('public')->url($this->media_file) : null;
+    }
+
+    // لینک دانلود فایل با حجم اصلی (از FTP_URL در .env ساخته می‌شود)
+    public function getMainFileUrlAttribute(): ?string
+    {
+        return $this->main_file ? Storage::disk('ftp')->url($this->main_file) : null;
+    }
+
+    // حجم فایل اصلی به صورت خوانا، مثل: 350.5 MB
+    public function getMainFileSizeLabelAttribute(): ?string
+    {
+        $bytes = (int) $this->media_file_main_size;
+
+        if ($bytes <= 0) {
+            return null;
+        }
+
+        return $bytes >= 1073741824
+            ? round($bytes / 1073741824, 2).' GB'
+            : round($bytes / 1048576, 1).' MB';
     }
 
     public function categories()

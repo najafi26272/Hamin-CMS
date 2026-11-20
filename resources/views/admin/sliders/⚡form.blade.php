@@ -225,33 +225,3 @@ new #[Layout('layouts::admin')] class extends Component
     </form>
 </div>
 
-@assets
-<style>
-    .banner-upload {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        aspect-ratio: 16 / 5;
-        border: 2px dashed var(--bs-border-color);
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: pointer;
-    }
-
-    .banner-upload img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .banner-loading {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, .45);
-        align-items: center;
-        justify-content: center;
-    }
-</style>
-@endassets

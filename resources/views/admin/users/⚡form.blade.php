@@ -87,9 +87,10 @@ new #[Layout('layouts::admin')] class extends Component
             'birth_date' => ['nullable', 'date', 'before:today'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'phone' => ['nullable', 'regex:/^0\d{10}$/'],
-            'mobile' => ['nullable', 'regex:/^09\d{9}$/', Rule::unique('users', 'mobile')->ignore($id)],
+            // موبایل برای ورود لازم است
+            'mobile' => ['required', 'regex:/^09\d{9}$/', Rule::unique('users', 'mobile')->ignore($id)],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id)],
-            'username' => ['required', 'min:3', 'max:50', 'regex:/^[A-Za-z0-9_.]+$/', Rule::unique('users', 'username')->ignore($id)],
+            'username' => ['nullable', 'min:3', 'max:50', 'regex:/^[A-Za-z0-9_.]+$/', Rule::unique('users', 'username')->ignore($id)],
             'city' => ['nullable', Rule::exists('provinces', 'name')],
             'virtual_space_number' => ['nullable', 'regex:/^09\d{9}$/'],
             'instagram_id' => ['nullable', 'max:30', 'regex:/^[A-Za-z0-9_.]+$/'],
@@ -98,7 +99,6 @@ new #[Layout('layouts::admin')] class extends Component
             'art_specialty.*' => [Rule::exists('art_specialties', 'id')],
             'roles' => ['nullable', 'array'],
             'roles.*' => [Rule::exists('roles', 'id')],
-            'password' => [$this->user ? 'nullable' : 'required', 'min:8', 'confirmed'],
         ];
     }
 
@@ -123,8 +123,7 @@ new #[Layout('layouts::admin')] class extends Component
             'avatar.image' => 'فایل انتخاب شده باید تصویر باشد.',
             'avatar.mimes' => 'فرمت تصویر باید jpg، png یا webp باشد.',
             'avatar.max' => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
-            'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
-            'password.confirmed' => 'رمز عبور و تکرار آن یکسان نیستند.',
+
         ];
     }
 
@@ -185,7 +184,7 @@ new #[Layout('layouts::admin')] class extends Component
             'phone' => $this->phone ?: null,
             'mobile' => $this->mobile ?: null,
             'email' => trim($this->email) ?: null,
-            'username' => trim($this->username),
+            'username' => trim($this->username) ?: null,
             'city' => $this->city ?: null,
             'virtual_space_number' => $this->virtual_space_number ?: null,
             'instagram_id' => $this->instagram_id ?: null,
@@ -271,7 +270,7 @@ new #[Layout('layouts::admin')] class extends Component
                         <h6 class="card-title mb-4">تصویر پروفایل</h6>
 
                         <div class="avatar-upload mx-auto mb-3">
-                            <img class="avatar-preview"
+                            <img style="border-radius: 50px" width="100" class="avatar-preview"
                                  src="{{ $avatar && ! $errors->has('avatar') ? $avatar->temporaryUrl() : ($user?->avatar_url ?? asset('assets/admin/images/faces/pro.png')) }}"
                                  alt="تصویر پروفایل">
 
@@ -407,7 +406,7 @@ new #[Layout('layouts::admin')] class extends Component
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">پست الکترونیکی <span class="text-danger">*</span></label>
+                                <label for="email" class="form-label">پست الکترونیکی </label>
                                 <div class="input-group has-validation">
                                     <span class="input-group-text" wire:ignore><i data-feather="mail"></i></span>
                                     <input type="email" id="email" wire:model="email" dir="ltr"
@@ -442,11 +441,10 @@ new #[Layout('layouts::admin')] class extends Component
                 {{-- اطلاعات ورود --}}
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h6 class="card-title mb-4">اطلاعات ورود</h6>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="username" class="form-label">نام کاربری <span class="text-danger">*</span></label>
+                                <label for="username" class="form-label">نام کاربری </label>
                                 <div class="input-group has-validation">
                                     <span class="input-group-text" wire:ignore><i data-feather="at-sign"></i></span>
                                     <input type="text" id="username" wire:model="username" dir="ltr" autocomplete="off"
@@ -455,34 +453,10 @@ new #[Layout('layouts::admin')] class extends Component
                                 </div>
                             </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="password" class="form-label">
-                                    رمز عبور
-                                    @if ($user)
-                                        <small class="text-muted">(برای عدم تغییر، خالی بگذارید)</small>
-                                    @else
-                                        <span class="text-danger">*</span>
-                                    @endif
-                                </label>
-                                <div class="input-group has-validation">
-                                    <span class="input-group-text" wire:ignore><i data-feather="lock"></i></span>
-                                    <input type="password" id="password" wire:model="password" dir="ltr" autocomplete="new-password"
-                                           class="form-control text-start @error('password') is-invalid @enderror" placeholder="حداقل ۸ کاراکتر">
-                                    @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                                </div>
-                            </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="password_confirmation" class="form-label">تکرار رمز عبور</label>
-                                <div class="input-group">
-                                    <span class="input-group-text" wire:ignore><i data-feather="lock"></i></span>
-                                    <input type="password" id="password_confirmation" wire:model="password_confirmation" dir="ltr" autocomplete="new-password"
-                                           class="form-control text-start" placeholder="تکرار رمز عبور">
-                                </div>
-                            </div>
 
                             @can('manage-roles')
-                            <div class="col-12 mb-3">
+                            <div class="col-8 mb-3">
                                 <label for="roles" class="form-label">نقش‌های کاربر</label>
                                 <div wire:ignore>
                                     <select id="roles" class="form-select" multiple>
@@ -512,58 +486,6 @@ new #[Layout('layouts::admin')] class extends Component
     </form>
 </div>
 
-@assets
-<style>
-    .avatar-upload {
-        position: relative;
-        width: 140px;
-        height: 140px;
-    }
-
-    .avatar-upload .avatar-preview {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid var(--bs-border-color);
-    }
-
-    .avatar-upload .avatar-loading {
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, .45);
-        align-items: center;
-        justify-content: center;
-    }
-
-    .avatar-upload .avatar-btn {
-        position: absolute;
-        bottom: 4px;
-        left: 4px;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: #6571ff;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
-    }
-
-    .avatar-upload .avatar-btn svg {
-        width: 18px;
-        height: 18px;
-    }
-
-    .select2-container--default .select2-selection--multiple {
-        min-height: 38px;
-        border-color: var(--bs-border-color);
-    }
-</style>
-@endassets
 
 @script
 <script>

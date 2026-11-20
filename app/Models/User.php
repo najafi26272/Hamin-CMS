@@ -32,7 +32,7 @@ class User extends Authenticatable
     protected $fillable = [
         'first_name', 'last_name', 'birth_date', 'avatar', 'phone', 'mobile',
         'email', 'username', 'city', 'virtual_space_number', 'instagram_id',
-        'education_degree', 'password', 'artist_status', 'artist_rejection_reason', 'reviewed_at', 'reviewed_by',
+        'education_degree', 'password', 'artist_status', 'artist_rejection_reason', 'reviewed_at', 'reviewed_by','mobile_verified_at'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -44,6 +44,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'reviewed_at' => 'datetime',
             'password' => 'hashed',
+            'mobile_verified_at' => 'datetime'
         ];
     }
 
@@ -114,6 +115,19 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->roles->contains('name', 'admin');
+    }
+
+    // شماره موبایل به شکل استاندارد 09xxxxxxxxx: ارقام فارسی/عربی، فاصله، خط تیره و پیشوند +98 / 0098 / 98
+    public static function normalizeMobile(string $mobile): string
+    {
+        $mobile = strtr($mobile, [
+            '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9',
+            '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+        ]);
+        $mobile = preg_replace('/[\s\-()]+/', '', $mobile);
+        $mobile = preg_replace('/^(?:\+98|0098|98)(?=9\d{9}$)/', '0', $mobile);
+
+        return preg_match('/^9\d{9}$/', $mobile) ? '0'.$mobile : $mobile;
     }
 
     // در حالت توسعه سایت فقط این کاربران (مدیر اصلی و نویسندگان) وارد می‌شوند و سایت را می‌بینند

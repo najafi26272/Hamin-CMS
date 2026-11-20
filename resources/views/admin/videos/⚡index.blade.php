@@ -158,35 +158,3 @@ new #[Layout('layouts::admin'), Title('فیلم‌ها')] class extends Componen
     </div>
 </div>
 
-@assets
-<style>
-    .video-thumb {
-        position: relative;
-        width: 64px;
-        height: 40px;
-        border-radius: 6px;
-        overflow: hidden;
-        background: var(--bs-secondary-bg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .video-thumb img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .video-thumb svg {
-        position: relative;
-        width: 20px;
-        height: 20px;
-        color: #fff;
-        filter: drop-shadow(0 0 2px rgba(0, 0, 0, .6));
-    }
-</style>
-@endassets

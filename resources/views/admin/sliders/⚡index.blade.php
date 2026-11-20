@@ -134,14 +134,3 @@ new #[Layout('layouts::admin'), Title('اسلایدرها')] class extends Compo
     </div>
 </div>
 
-@assets
-<style>
-    .slider-thumb {
-        width: 160px;
-        aspect-ratio: 16 / 5;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 1px solid var(--bs-border-color);
-    }
-</style>
-@endassets

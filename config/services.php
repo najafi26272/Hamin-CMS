@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'amoot' => [
+        'token'      => env('AMOOT_TOKEN'),
+        'pattern_id' => env('AMOOT_PATTERN_ID'),   // اختیاری؛ اگر خالی باشد از SendQuickOTP استفاده می‌شود
+        'line'       => env('AMOOT_LINE', 'public'), // فقط برای پیامک ساده
+        'driver'     => env('AMOOT_DRIVER', 'api'),  // api | log
+    ],
+
 ];

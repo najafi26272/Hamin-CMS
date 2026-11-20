@@ -284,7 +284,7 @@ new #[Layout('layouts::admin')] class extends Component
                         @php($thumbPreview = $thumbnail && ! $errors->has('thumbnail') ? $thumbnail->temporaryUrl() : ($removeThumbnail ? null : $video?->thumbnail_url))
 
                         <div class="position-relative">
-                            <label for="thumbnail" class="thumbnail-upload">
+                            <label for="thumbnail" class="thumbnail-upload thumbnail-upload-wide">
                                 @if ($thumbPreview)
                                     <img src="{{ $thumbPreview }}" alt="تصویر اصلی">
                                 @else
@@ -326,85 +326,6 @@ new #[Layout('layouts::admin')] class extends Component
 @assets
 <script src="{{ asset('assets/admin/vendors/ckeditor5/ckeditor5.umd.js') }}"></script>
 <script src="{{ asset('assets/admin/vendors/ckeditor5/translations/fa.umd.js') }}"></script>
-<style>
-    [x-cloak] {
-        display: none !important;
-    }
-
-    .video-preview {
-        width: 100%;
-        max-height: 360px;
-        border-radius: 8px;
-        background: #000;
-    }
-
-    .video-dropzone {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        min-height: 120px;
-        padding: 1rem;
-        border: 2px dashed var(--bs-border-color);
-        border-radius: 8px;
-        cursor: pointer;
-        margin: 0;
-    }
-
-    .video-dropzone:hover {
-        border-color: #6571ff;
-    }
-
-    .thumbnail-upload {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        border: 2px dashed var(--bs-border-color);
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: pointer;
-        margin: 0;
-    }
-
-    .thumbnail-upload img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .thumbnail-loading {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, .45);
-        align-items: center;
-        justify-content: center;
-    }
-
-    .thumbnail-remove {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        width: 28px;
-        height: 28px;
-        padding: 0;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .thumbnail-remove svg {
-        width: 16px;
-        height: 16px;
-    }
-
-    .ck.ck-editor__editable_inline {
-        min-height: 200px;
-    }
-</style>
 @endassets
 
 @script

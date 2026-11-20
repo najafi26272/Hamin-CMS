@@ -35,6 +35,9 @@
     <link rel="icon" href="{{ \App\Models\Setting::faviconUrl() }}">
     <link rel="stylesheet" href="{{asset("assets/admin/vendors/sweetalert2/sweetalert2.min.css")}}">
 
+    {{-- استایل صفحه‌های پنل (به جای <style> داخل کامپوننت‌ها) --}}
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/components.css') }}?v={{ filemtime(public_path('assets/admin/css/components.css')) }}">
+
     @stack('css')
 
     @livewireStyles

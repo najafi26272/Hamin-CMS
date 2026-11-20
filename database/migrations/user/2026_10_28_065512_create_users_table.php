@@ -19,15 +19,15 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('phone', 20)->nullable();
             $table->string('mobile', 20)->unique();
-            $table->string('email')->unique();
+            $table->string('email')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('username')->unique();
+            $table->string('username')->nullable();
             $table->string('city')->nullable();
             $table->string('virtual_space_number', 20)->nullable(); // شماره فضای مجازی
             $table->string('instagram_id')->nullable();           // بدون @
             $table->string('education_degree')->nullable();
             $table->string('art_specialty')->nullable();          // تخصص هنری
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

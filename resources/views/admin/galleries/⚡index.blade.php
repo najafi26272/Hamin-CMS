@@ -162,16 +162,3 @@ new #[Layout('layouts::admin'), Title('گالری تصاویر')] class extends 
     </div>
 </div>
 
-@assets
-<style>
-    .gallery-thumbs img {
-        object-fit: cover;
-        border: 2px solid var(--bs-body-bg);
-        margin-inline-start: -10px;
-    }
-
-    .gallery-thumbs img:first-child {
-        margin-inline-start: 0;
-    }
-</style>
-@endassets

@@ -288,38 +288,3 @@ new #[Layout('layouts::admin')] class extends Component
     </form>
 </div>
 
-@assets
-<style>
-    .settings-preview {
-        position: relative;
-        height: 120px;
-        border: 1px dashed var(--bs-border-color);
-        border-radius: 10px;
-        display: grid;
-        place-items: center;
-        padding: 14px;
-        overflow: hidden;
-        background:
-            repeating-conic-gradient(rgba(128, 128, 128, .08) 0 25%, transparent 0 50%) 0 0 / 16px 16px;
-    }
-
-    .settings-preview img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .settings-preview-square img {
-        width: 64px;
-        height: 64px;
-    }
-
-    .settings-preview-loading {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, .45);
-        align-items: center;
-        justify-content: center;
-    }
-</style>
-@endassets

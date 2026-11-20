@@ -30,7 +30,8 @@ class SiteSettingsTest extends TestCase
 
     private function makeUser(string $username, ?string $role = null): User
     {
-        $user = User::create(['first_name' => 'کاربر', 'last_name' => 'تست', 'username' => $username, 'password' => 'secret123']);
+        static $n = 0;
+        $user = User::create(['first_name' => 'کاربر', 'last_name' => 'تست', 'username' => $username, 'mobile' => '0912000'.str_pad((string) ++$n, 4, '0', STR_PAD_LEFT), 'password' => 'secret123']);
         if ($role) {
             $user->roles()->attach(Role::where('name', $role)->value('id'));
         }
@@ -108,17 +109,17 @@ class SiteSettingsTest extends TestCase
     public function test_only_admin_and_authors_can_login_in_maintenance(): void
     {
         Setting::set(['maintenance_mode' => true]);
-        $this->makeUser('artist_test', 'artist');
-        $this->makeUser('author_test', 'author');
+        $artist = $this->makeUser('artist_test', 'artist');
+        $author = $this->makeUser('author_test', 'author');
 
         Livewire::test('auth::login')
-            ->set('username', 'artist_test')->set('password', 'secret123')
+            ->set('mobile', $artist->mobile)->set('password', 'secret123')
             ->call('login')
-            ->assertHasErrors('username');
+            ->assertHasErrors('mobile');
         $this->assertGuest();
 
         Livewire::test('auth::login')
-            ->set('username', 'author_test')->set('password', 'secret123')
+            ->set('mobile', $author->mobile)->set('password', 'secret123')
             ->call('login')
             ->assertHasNoErrors()
             ->assertRedirect(route('dashboard'));

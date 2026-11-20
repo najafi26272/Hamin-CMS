@@ -32,22 +32,17 @@
                         </div>
                         <div class="text-center">
                             <p class="tx-16 fw-bolder">{{ Auth::user()?->first_name }} {{ Auth::user()?->last_name }}</p>
-                            <p class="tx-12 text-muted">{{Auth::user()?->username}}</p>
+                            <p class="tx-12 text-muted">{{Auth::user()?->mobile}}</p>
                         </div>
                     </div>
                     <ul class="list-unstyled p-1">
                         <li class="dropdown-item py-2">
-                            <a href="" class="text-body ms-0">
+                            <a href="{{route('profile.edit' , ['user'=>Auth::user()])}}" class="text-body ms-0">
                                 <i class="me-2 icon-md" data-feather="edit"></i>
                                 <span>ویرایش پروفایل</span>
                             </a>
                         </li>
-                        <li class="dropdown-item py-2">
-                            <a href="" class="text-body ms-0">
-                                <i class="me-2 icon-md" data-feather="key"></i>
-                                <span>تغییر رمز عبور</span>
-                            </a>
-                        </li>
+
                         <li class="dropdown-item py-2">
                             <a href="{{route('logout')}}" class="text-body ms-0">
                                 <i class="me-2 icon-md" data-feather="log-out"></i>

@@ -27,6 +27,7 @@ new #[Layout('layouts::admin')] class extends Component
     public string $instagram_id = '';
     public string $education_degree = '';
     public array $specialties = [];    // شناسه تخصص‌های هنری
+    public string $username = '';
 
     public function mount(): void
     {
@@ -40,6 +41,7 @@ new #[Layout('layouts::admin')] class extends Component
         $this->virtual_space_number = (string) $user->virtual_space_number;
         $this->instagram_id = (string) $user->instagram_id;
         $this->education_degree = (string) $user->education_degree;
+        $this->username = (string) $user->username;
         $this->specialties = $user->artSpecialties()->pluck('art_specialties.id')->map(fn ($id) => (string) $id)->all();
     }
 
@@ -69,15 +71,16 @@ new #[Layout('layouts::admin')] class extends Component
             'birth_date' => ['required', 'date', 'before:today'],
             // اگر کاربر قبلا تصویر پروفایل داشته باشد، انتخاب دوباره لازم نیست
             'avatar' => [$this->user->avatar ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'phone' => ['required', 'regex:/^0\d{10}$/'],
+            'phone' => ['nullable', 'regex:/^0\d{10}$/'],
             'mobile' => ['required', 'regex:/^09\d{9}$/', Rule::unique('users', 'mobile')->ignore($id)],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id)],
+            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($id)],
             'city' => ['required', Rule::exists('provinces', 'name')],
             'virtual_space_number' => ['required', 'regex:/^09\d{9}$/'],
             'instagram_id' => ['required', 'max:30', 'regex:/^[A-Za-z0-9_.]+$/'],
             'education_degree' => ['required', Rule::in(User::EDUCATION_DEGREES)],
             'specialties' => ['required', 'array', 'min:1'],
             'specialties.*' => [Rule::exists('art_specialties', 'id')],
+            'username' => ['required', 'string', 'min:3', 'max:50', 'regex:/^[A-Za-z0-9_]+$/', Rule::unique('users', 'username')->ignore($id)],
         ];
     }
 
@@ -106,6 +109,8 @@ new #[Layout('layouts::admin')] class extends Component
             'avatar.image' => 'فایل انتخاب شده باید تصویر باشد.',
             'avatar.mimes' => 'فرمت تصویر باید jpg، png یا webp باشد.',
             'avatar.max' => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
+            'username.regex' => 'نام کاربری فقط می‌تواند شامل حروف انگلیسی، عدد و _ باشد.',
+            'username.min' => ':attribute باید حداقل :min کاراکتر باشد.',
         ];
     }
 
@@ -123,6 +128,7 @@ new #[Layout('layouts::admin')] class extends Component
             'education_degree' => 'مدرک تحصیلی',
             'specialties' => 'تخصص هنری',
             'specialties.*' => 'تخصص هنری',
+            'username' => 'نام کاربری',
         ];
     }
 
@@ -147,6 +153,9 @@ new #[Layout('layouts::admin')] class extends Component
         $this->instagram_id = ltrim(trim($this->instagram_id), '@');
 
         try {
+            $this->email = trim($this->email);
+            $this->phone = trim($this->phone);
+            $this->username = trim($this->username);
             $this->validate();
         } catch (ValidationException $e) {
             $this->dispatch('notify', type: 'error', message: 'لطفا خطاهای فرم را بررسی کنید.');
@@ -160,10 +169,11 @@ new #[Layout('layouts::admin')] class extends Component
             $user->update([
                 'birth_date' => $this->birth_date,
                 'avatar' => $newAvatar ?? $user->avatar,
-                'phone' => $this->phone,
+                'phone' => filled($this->phone) ? $this->phone : null,
+                'email' => filled($this->email) ? $this->email : null,
                 'mobile' => $this->mobile,
-                'email' => trim($this->email),
                 'city' => $this->city,
+                'username' => $this->username,
                 'virtual_space_number' => $this->virtual_space_number,
                 'instagram_id' => $this->instagram_id,
                 'education_degree' => $this->education_degree,
@@ -318,19 +328,17 @@ new #[Layout('layouts::admin')] class extends Component
                             @error('specialties.*') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
 
-                        <h6 class="text-primary mb-3 mt-2">اطلاعات تماس</h6>
-
                         <div class="col-md-6 mb-3">
                             <label for="mobile" class="form-label">شماره موبایل <span class="text-danger">*</span></label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text" wire:ignore><i data-feather="smartphone"></i></span>
-                                <input type="text" id="mobile" wire:model="mobile" dir="ltr" inputmode="numeric" maxlength="11" class="form-control text-start @error('mobile') is-invalid @enderror" placeholder="09123456789">
+                                <input disabled type="text" id="mobile"  dir="ltr" inputmode="numeric" maxlength="11" class="form-control text-start @error('mobile') is-invalid @enderror" placeholder="09123456789">
                                 @error('mobile') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="phone" class="form-label">شماره تماس (ثابت) <span class="text-danger">*</span></label>
+                            <label for="phone" class="form-label">شماره تماس (ثابت) </label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text" wire:ignore><i data-feather="phone"></i></span>
                                 <input type="text" id="phone" wire:model="phone" dir="ltr" inputmode="numeric" maxlength="11" class="form-control text-start @error('phone') is-invalid @enderror" placeholder="02112345678">
@@ -339,7 +347,7 @@ new #[Layout('layouts::admin')] class extends Component
                         </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="email" class="form-label">پست الکترونیکی <span class="text-danger">*</span></label>
+                            <label for="email" class="form-label">پست الکترونیکی </label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text" wire:ignore><i data-feather="mail"></i></span>
                                 <input type="email" id="email" wire:model="email" dir="ltr" class="form-control text-start @error('email') is-invalid @enderror" placeholder="example@mail.com">
@@ -364,6 +372,17 @@ new #[Layout('layouts::admin')] class extends Component
                                 @error('instagram_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
+
+
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">نام کاربری <span class="text-danger">*</span></label>
+                            <div class="input-group has-validation">
+                                <span class="input-group-text" wire:ignore><i data-feather="user"></i></span>
+                                <input type="text" id="username" wire:model="username" dir="ltr" class="form-control text-start @error('username') is-invalid @enderror" placeholder="username">
+                                @error('username') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                        </div>
+
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-icon-text mt-2" wire:loading.attr="disabled" wire:target="submit, avatar">
@@ -377,53 +396,6 @@ new #[Layout('layouts::admin')] class extends Component
     @endif
 </div>
 
-@assets
-<style>
-    .register-avatar {
-        position: relative;
-        width: 84px;
-        height: 84px;
-        flex-shrink: 0;
-        cursor: pointer;
-    }
-
-    .register-avatar img {
-        width: 84px;
-        height: 84px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid var(--bs-border-color);
-    }
-
-    .register-avatar-btn {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: #6571ff;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .register-avatar-btn svg {
-        width: 15px;
-        height: 15px;
-    }
-
-    .register-avatar-loading {
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, .45);
-        align-items: center;
-        justify-content: center;
-    }
-</style>
-@endassets
 
 @script
 <script>

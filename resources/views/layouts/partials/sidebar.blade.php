@@ -170,15 +170,15 @@
                 </li>
             @endcan
 
-            @can('manage-forms')
-                <li class="nav-item nav-category">فرم‌ها</li>
-                <li @class(['nav-item', 'active' => request()->routeIs('form-builder.admin.*')])>
-                    <a href="{{ route('form-builder.admin.forms.index') }}" class="nav-link">
-                        <i class="link-icon" data-feather="clipboard"></i>
-                        <span class="link-title">فرم‌ساز</span>
-                    </a>
-                </li>
-            @endcan
+{{--            @can('manage-forms')--}}
+{{--                <li class="nav-item nav-category">فرم‌ها</li>--}}
+{{--                <li @class(['nav-item', 'active' => request()->routeIs('form-builder.admin.*')])>--}}
+{{--                    <a href="{{ route('form-builder.admin.forms.index') }}" class="nav-link">--}}
+{{--                        <i class="link-icon" data-feather="clipboard"></i>--}}
+{{--                        <span class="link-title">فرم‌ساز</span>--}}
+{{--                    </a>--}}
+{{--                </li>--}}
+{{--            @endcan--}}
 
             {{-- تنظیمات سایت: تنظیمات عمومی، اسلایدرها و شبکه‌های اجتماعی --}}
             @canany(['manage-settings', 'manage-sliders', 'manage-social-links'])

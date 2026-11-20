@@ -210,14 +210,6 @@ new #[Layout('layouts::admin')] class extends Component
     </form>
 </div>
 
-@assets
-<style>
-    .select2-container--default .select2-selection--multiple {
-        min-height: 38px;
-        border-color: var(--bs-border-color);
-    }
-</style>
-@endassets
 
 @script
 <script>

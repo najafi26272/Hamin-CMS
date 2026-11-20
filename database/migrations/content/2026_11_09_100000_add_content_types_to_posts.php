@@ -16,7 +16,10 @@ return new class extends Migration
             // نوع محتوا: news (اخبار)، visual (لوح)، audio (شنیداری)، video (تماشایی)، poem (شعر)
             $table->string('type', 20)->default('news')->index()->after('user_id');
             $table->string('creator_name')->nullable()->after('slug');   // نام صاحب اثر / سازنده / شاعر
-            $table->string('media_file')->nullable()->after('image');    // فایل اصلی: تصویر، صوت یا ویدیو
+            $table->string('media_file')->nullable()->after('image');    // فایل : تصویر، صوت یا ویدیو
+            $table->string('media_file_main_size')->nullable()->after('media_file');    // فایل اصلی با حجم زیاد: تصویر، صوت یا ویدیو
+            $table->string('file_link')->nullable()->after('media_file_main_size');    //لینک دانلود فایل ها
+            $table->string('aparat_hash')->nullable()->after('file_link');    //لینک دانلود فایل ها
 
             // وضعیت: draft | pending | published | rejected
             $table->string('status', 20)->default('draft')->change();
